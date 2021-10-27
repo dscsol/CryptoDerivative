@@ -9,6 +9,7 @@ class Router {
     router.post("/connectWallet", this.connectWallet.bind(this));
     router.post("/getTransactions", this.getTransactionsRecord.bind(this));
     router.post("/addTransaction", this.addTransaction.bind(this));
+    return router;
   }
 
   async connectWallet(req, res) {
