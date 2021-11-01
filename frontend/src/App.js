@@ -1,23 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import Nav from "./components/Nav";
+import axios from "redaxios";
+import { useDispatch } from "react-redux";
+import { addWallet } from "./redux/walletSlice";
+import web3 from "./web3";
+import { useEffect } from "react";
+import { useState } from "react";
 
 function App() {
+  let dispatch = useDispatch();
+  let [info, setInfo] = useState("");
+
+  async function fetch() {
+    let result = await axios.get(`${process.env.REACT_APP_SERVER}/test`);
+    console.log(result.data);
+  }
+
+  useEffect(() => {
+    window.onload = async function () {
+      let data = await web3.eth.getAccounts();
+      if (data[0]) {
+        dispatch(addWallet(data[0]));
+      }
+    };
+    fetch();
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Nav />
     </div>
   );
 }

@@ -12,6 +12,7 @@ class Method {
       await knex.insert({ wallet_id: walletId }).into("users");
     }
   }
+  121882;
 
   async getTransactionsRecord(walletId) {
     let id = await knex("users").where("wallet_id", walletId);
