@@ -14,7 +14,7 @@ function Wallet() {
       });
       const account = accounts[0];
       await axios.post(`${process.env.REACT_APP_SERVER}/connectWallet`, {
-        walletId: account,
+        walletID: account,
       });
       dispatch(addWallet(account));
     }

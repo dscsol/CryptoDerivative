@@ -4,14 +4,12 @@ import { useDispatch } from "react-redux";
 import { addWallet } from "./redux/walletSlice";
 import web3 from "./web3";
 import { useEffect } from "react";
-import { useState } from "react";
 
 function App() {
   let dispatch = useDispatch();
-  let [info, setInfo] = useState("");
 
   async function fetch() {
-    let result = await axios.get(`${process.env.REACT_APP_SERVER}/test`);
+    let result = await axios.get(`${process.env.REACT_APP_SERVER}/quote`);
     console.log(result.data);
   }
 

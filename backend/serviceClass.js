@@ -6,25 +6,46 @@ class Method {
     this.knex = knex;
   }
 
-  async storeWalletId(walletId) {
-    let exisitingUser = await knex("users").where("wallet_id", walletId);
+  async storeWalletID(walletID) {
+    let exisitingUser = await knex("users").where("walletID", walletID);
     if (!exisitingUser[0]) {
-      await knex.insert({ wallet_id: walletId }).into("users");
+      await knex.insert({ walletID: walletID }).into("users");
     }
   }
-  121882;
 
-  async getTransactionsRecord(walletId) {
-    let id = await knex("users").where("wallet_id", walletId);
+  async getUserID(walletID) {
+    let exisitingUser = await knex("users").where("walletID", walletID);
+    return exisitingUser[0].id;
+  }
+
+  async getTransactionsRecord(walletID) {
+    let id = await knex("users").where("walletID", walletID);
     if (id[0]) {
       let data = await knex.select("*").from("transactions").where("id", id[0]);
       return data;
     } else {
-      await knex.insert({ wallet_id: walletId }).into("users");
+      await knex.insert({ walletID: walletID }).into("users");
     }
   }
 
-  async purchaseRecord(transaction, walletId) {}
+  async addTransactionsRecord(data) {
+    let id = await knex("users").select("id").where("walletID", walletID);
+    await knex
+      .insert({
+        tranxType: data.tranxType,
+        exchange: data.exchange,
+        exchangeOrderID: data.exchangeOrderID,
+        asset: data.asset,
+        expiryDate: data.expiryDate,
+        orderSide: data.orderSide,
+        orderType: data.orderType,
+        quantity: data.quantity,
+        price: data.price,
+        currency: data.currency,
+        orderStatus: data.orderStatus,
+        userID: id[0],
+      })
+      .into("transactions");
+  }
 }
-
 module.exports = Method;
