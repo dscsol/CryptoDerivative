@@ -74,9 +74,9 @@ class Router {
   }
 
   async getPrice(req, res) {
-    let asset = "BTC";
-    let quantity = 2;
-    let date = new Date();
+    let asset = req.body.asset;
+    let quantity = req.body.quantity;
+    let date = req.body.date;
 
     //Get all contract
     let url = await GenerateURL("/vapi/v1/optionInfo", "", "");
@@ -124,7 +124,6 @@ class Router {
     };
     let markPrice = await axios(markPriceRequestConfig);
     let cost = markPrice.data.data[0].markPrice * quantity;
-    console.log(cost);
     res.send(`${cost}`);
   }
 

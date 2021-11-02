@@ -8,11 +8,6 @@ import { useEffect } from "react";
 function App() {
   let dispatch = useDispatch();
 
-  async function fetch() {
-    let result = await axios.get(`${process.env.REACT_APP_SERVER}/quote`);
-    console.log(result.data);
-  }
-
   useEffect(() => {
     window.onload = async function () {
       let data = await web3.eth.getAccounts();
@@ -20,7 +15,6 @@ function App() {
         dispatch(addWallet(data[0]));
       }
     };
-    fetch();
   });
 
   return (
