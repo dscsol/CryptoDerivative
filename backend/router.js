@@ -34,7 +34,7 @@ class Router {
     router.post("/getTransactions", this.getTransactionsRecord.bind(this));
     router.post("/addTransaction", this.addTransaction.bind(this));
     router.get("/account", this.accountBalance.bind(this));
-    router.get("/quote", this.getPrice.bind(this));
+    router.post("/quote", this.getPrice.bind(this));
     return router;
   }
 
@@ -74,9 +74,10 @@ class Router {
   }
 
   async getPrice(req, res) {
-    let asset = req.body.asset;
-    let quantity = req.body.quantity;
-    let date = req.body.date;
+    console.log(req.body);
+    let asset = req.body.formObj.underlying;
+    let quantity = req.body.formObj.optionSize;
+    let date = req.body.formObj.optionEndDate;
 
     //Get all contract
     let url = await GenerateURL("/vapi/v1/optionInfo", "", "");
@@ -96,7 +97,8 @@ class Router {
       let diffB = Math.abs(date - b.expiryDate);
       return diffA - diffB;
     });
-    //Get current underlying asset market price
+
+    // Get current underlying asset market price
     let indexQueryString = `underlying=${sortDate[0].underlying}`;
     let indexUrl = await GenerateURL("/vapi/v1/index", indexQueryString, "");
     let indexRequestConfig = {
@@ -125,6 +127,7 @@ class Router {
     let markPrice = await axios(markPriceRequestConfig);
     let cost = markPrice.data.data[0].markPrice * quantity;
     res.send(`${cost}`);
+    // res.end();
   }
 
   async transferToOption(req, res) {
