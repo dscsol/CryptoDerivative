@@ -26,9 +26,17 @@ const RequestForm = () => {
   ];
   const arrOptionSide = [{ value: "buy", html: "Buy" }];
 
+  const isLeapYear = (year) => {
+    return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
+  };
+  const days_of_a_year = (year) => {
+    return isLeapYear(year) ? 366 : 365;
+  };
+
   // set all var state
   const [validated, setValidated] = useState(false);
   const [isSubmitDisable, setIsSubmitDisable] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // Set state as a whole object
   let defaultDate = new Date();
@@ -38,54 +46,71 @@ const RequestForm = () => {
     optionSize: 1,
     timeHorizon: 1,
     optionEndDate: defaultDate.toISOString(),
-    // optionType: "call",
-    // optionPrice: 0,
-    // optionCurrency: "usd",
-    // optionSide: "buy",
   };
   const [formObj, setFormObj] = useState(formObjInit);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formObj);
-    const form = e.currentTarget;
-    console.log(e);
-    console.log(form);
-    if (form.checkValidity()) {
+    setErrors(handleError(formObj));
+    if (Object.keys(errors).length == 0) {
       setValidated(true);
-      // let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
-      //   formObj,
-      // });
-      // console.log(cost.data);
+      let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
+        formObj,
+      });
+      console.log(cost.data);
 
       // reset formObj to default
-      setFormObj(formObjInit);
-      setIsSubmitDisable(false);
-      setValidated(false);
+      // setFormObj(formObjInit);
+      // setIsSubmitDisable(false);
+      // setValidated(false);
     }
   };
 
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   // console.log(isSubmitDisable);
-  //   // setIsSubmitDisable(true);
-  //   // console.log(isSubmitDisable);
-  //   // setIsSubmitDisable(false);
-  //   // console.log(isSubmitDisable);
+  // input validation, return as obj
+  const handleError = (obj) => {
+    let newErrors = {};
+    Object.keys(obj).map((name) => {
+      switch (name) {
+        case "underlying":
+          if (!obj[name] || obj[name] == "") {
+            newErrors[name] = "Please choose an asset.";
+          }
+          break;
+        case "optionSize":
+          if (!obj[name] || obj[name] == "") {
+            newErrors[name] = "Amount cannot be empty.";
+          } else if (obj[name] < 0.001) {
+            newErrors[name] = "Amount cannot be smaller than 0.001.";
+          }
+          break;
+        case "timeHorizon":
+          if (!obj[name] || obj[name] == "") {
+            newErrors[name] = "Period cannot be empty.";
+          } else if (obj[name] < 1) {
+            newErrors[name] = "Minimum period is 1 day.";
+          } else if (obj[name] > 1462) {
+            newErrors[name] = "Maximum period is 4 years.";
+          }
+          break;
+        case "optionEndDate":
+          if (!obj[name] || obj[name] == "") {
+            newErrors[name] = "Period cannot be empty.";
+          } else {
+            let dayDiff = Math.ceil(
+              (new Date(obj[name]) - new Date()) / (1000 * 60 * 60 * 24)
+            );
 
-  //   const form = event.currentTarget;
-  //   if (form.checkValidity()) {
-  //     setValidated(true);
-  //     let quote = await axios.get(`${process.env.REACT_APP_SERVER}/quote`, {
-  //       formObj,
-  //     });
-
-  //     // reset formObj to default
-  //     setFormObj(formObjInit);
-  //     setIsSubmitDisable(false);
-  //     // setValidated(false);
-  //   }
-  // };
+            if (dayDiff < 1) {
+              newErrors[name] = "Minimum period is 1 day.";
+            } else if (dayDiff > 1462) {
+              newErrors[name] = "Maximum period is 4 years.";
+            }
+          }
+          break;
+      }
+    });
+    return newErrors;
+  };
 
   return (
     <div className={styles.FormQuote}>
@@ -143,18 +168,15 @@ const RequestForm = () => {
                     as="input"
                     required={true}
                     type="number"
-                    min={0.01}
                     step="any"
                     value={formObj.optionSize}
-                    onChange={(e) => {
-                      // handle empty input value
-
-                      e.target.value && e.target.value >= 0.01
-                        ? setFormObj({ ...formObj, optionSize: e.target.value })
-                        : setFormObj({ ...formObj, optionSize: 0.01 });
-                      console.log("formObj.underlying:", formObj.optionSize);
+                    isInvalid={Object.keys(errors).includes("optionSize")}
+                    onBlur={(e) => {
+                      setErrors(handleError({ optionSize: e.target.value }));
                     }}
-                    min={1}
+                    onChange={(e) => {
+                      setFormObj({ ...formObj, optionSize: e.target.value });
+                    }}
                   ></Form.Control>
                   <InputGroup.Text
                     className={styles["input-group"]}
@@ -162,6 +184,9 @@ const RequestForm = () => {
                   >
                     {formObj.underlying.toUpperCase()}
                   </InputGroup.Text>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.optionSize}
+                  </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
               {/* timeHorizon */}
@@ -181,36 +206,36 @@ const RequestForm = () => {
                     required={true}
                     type="number"
                     value={formObj.timeHorizon}
-                    min={1}
                     step={1}
-                    onChange={(e) => {
-                      let newDate = new Date();
-                      // handle empty input value
-                      if (e.target.value) {
+                    onBlur={(e) => {
+                      setErrors(
+                        handleError({ timeHorizon: formObj.timeHorizon })
+                      );
+                      console.log({ timeHorizon: e.target.value });
+                      console.log(errors);
+                      if (!Object.keys(errors).includes("timeHorizon")) {
+                        let newDate = new Date();
                         newDate.setDate(
                           newDate.getDate() +
                             Math.round(parseInt(e.target.value))
                         );
+                        console.log(newDate);
+                        console.log(newDate.toISOString());
                         setFormObj({
                           ...formObj,
-                          timeHorizon: Math.round(parseInt(e.target.value)),
-                          optionEndDate: newDate.toISOString(),
-                        });
-                      } else {
-                        newDate.setDate(
-                          newDate.getDate() + parseInt(formObjInit.timeHorizon)
-                        );
-
-                        setFormObj({
-                          ...formObj,
-                          timeHorizon: 1,
                           optionEndDate: newDate.toISOString(),
                         });
                       }
-
+                    }}
+                    isInvalid={Object.keys(errors).includes("timeHorizon")}
+                    onChange={(e) => {
+                      let newDate = new Date();
+                      setFormObj({
+                        ...formObj,
+                        timeHorizon: Math.round(parseInt(e.target.value)),
+                      });
                       console.log(newDate);
                     }}
-                    min={1}
                   ></Form.Control>
                   <InputGroup.Text
                     className={styles["input-group"]}
@@ -219,6 +244,9 @@ const RequestForm = () => {
                     Day
                     {formObj.timeHorizon > 1 ? <span>s</span> : null}
                   </InputGroup.Text>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.timeHorizon}
+                  </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
               {/* optionEndDate */}
@@ -228,19 +256,64 @@ const RequestForm = () => {
                 md="12"
                 controlId="optionEndDate"
               >
-                <Row>
-                  <Form.Label
+                <Form.Label className={styles["form-label"]}>
+                  Option End Date
+                </Form.Label>
+                <InputGroup hasValidation>
+                  <Form.Control
+                    className={styles["optionEndDate"]}
                     name="optionEndDate"
-                    className={styles["form-label"]}
+                    as="input"
+                    required={true}
+                    type="date"
+                    value={formObj.optionEndDate.substring(0, 10)}
+                    min={formObjInit.optionEndDate.substring(0, 10)}
+                    max={
+                      parseInt(formObjInit.optionEndDate.substring(0, 4)) +
+                      4 +
+                      formObjInit.optionEndDate.substring(4, 10)
+                    }
+                    onBlur={(e) => {
+                      setErrors(handleError({ optionEndDate: e.target.value }));
+                      if (!Object.keys(errors).includes("optionEndDate")) {
+                        let dayDiff = Math.ceil(
+                          (new Date(e.target.value) - new Date()) /
+                            (1000 * 60 * 60 * 24)
+                        );
+                        setFormObj({
+                          ...formObj,
+                          timeHorizon: dayDiff,
+                        });
+                      }
+                    }}
+                    onChange={(e) => {
+                      setErrors(handleError({ optionEndDate: e.target.value }));
+                      if (!Object.keys(errors).includes("optionEndDate")) {
+                        let newDate = new Date();
+                        newDate.setDate(
+                          newDate.getDate() +
+                            Math.round(parseInt(e.target.value))
+                        );
+                        setFormObj({
+                          ...formObj,
+                          optionEndDate: new Date(e.target.value).toISOString(),
+                        });
+                      }
+                    }}
+                    isInvalid={Object.keys(errors).includes("optionEndDate")}
+                  ></Form.Control>
+                  <InputGroup.Text
+                    className={styles["input-group"]}
+                    id={styles["inputGroupTimeZone"]}
                   >
-                    Option End Date
-                  </Form.Label>
-                </Row>
-                <Row>
-                  <Form.Label>
-                    {new Date(formObj.optionEndDate).toString()}
-                  </Form.Label>
-                </Row>
+                    {`0:00AM ${new Date(formObj.optionEndDate)
+                      .toString()
+                      .substring(25)}`}
+                  </InputGroup.Text>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.optionEndDate}
+                  </Form.Control.Feedback>
+                </InputGroup>
               </Form.Group>
             </Row>
             <Row>
