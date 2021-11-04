@@ -47,6 +47,7 @@ const RequestForm = () => {
     optionEndDate: defaultDate.toISOString(),
   };
   const [formObj, setFormObj] = useState(formObjInit);
+  const [quote, setQuote] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +57,8 @@ const RequestForm = () => {
       let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
         formObj,
       });
-      console.log(cost.data);
+
+      setQuote(cost.data);
 
       // reset formObj to default
       // setFormObj(formObjInit);
@@ -64,6 +66,8 @@ const RequestForm = () => {
       // setValidated(false);
     }
   };
+
+  console.log(quote);
 
   // input validation, return as obj
   const handleError = (obj) => {
@@ -331,8 +335,15 @@ const RequestForm = () => {
             </Row>
             <Row>
               {/* show json format */}
-              {validated && <p>{JSON.stringify(formObj, null, 4)}</p>}
+              {/* {validated && <p>{JSON.stringify(formObj, null, 4)}</p>} */}
             </Row>
+            <p>
+              {quote
+                ? `Your asset will be protected until ${new Date(
+                    quote.expiryDate
+                  ).toLocaleString()}, the total cost will be US$${quote.cost}`
+                : null}
+            </p>
           </Form>
         </Container>
       </div>
