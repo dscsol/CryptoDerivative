@@ -74,7 +74,6 @@ class Router {
   }
 
   async getPrice(req, res) {
-    console.log(req.body);
     let asset = req.body.formObj.underlying;
     let quantity = req.body.formObj.quantity;
     let date = req.body.formObj.expiryDate;
