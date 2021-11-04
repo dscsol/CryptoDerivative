@@ -1,48 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
+* body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
 .FormQuote {
-  background: #1a1b27;
-  border-radius: 4px;
+  background: #1A1B27;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
-.FormQuote > * {
-  color: #fcfcfc;
-}
-
-.color {
+.FormQuote .color {
   height: 100%;
   width: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(74, 90, 255, 0.16) 0%,
-    rgba(74, 90, 255, 0) 100%
-  );
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(74, 90, 255, 0.16) 0%, rgba(142, 146, 185, 0) 100%);
 }
 
-.container {
+.FormQuote .color .container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
 }
 
-.container h2 {
-  font-weight: bold;
-}
-
-.container form {
+.FormQuote .color .container form {
   width: 100%;
-  max-width: 700px;
+  max-width: 500px;
+  color: #fcfcfc;
 }
 
-select:disabled {
+.FormQuote .color .container form .form-label {
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.FormQuote .color .container form input, .FormQuote .color .container form select, .FormQuote .color .container form label, .FormQuote .color .container form .input-group {
+  font-size: 1.2rem;
+  color: #fcfcfc;
+  background-color: transparent;
+}
+
+.FormQuote .color .container form input, .FormQuote .color .container form select {
+  border: none;
+  border-bottom: 1px solid #fcfcfc;
+  border-radius: 0;
+}
+
+.FormQuote .color .container form input:focus, .FormQuote .color .container form select:focus {
+  border-bottom: 1px solid #fcfcfc;
+  box-shadow: none;
+  outline: 0 none;
+}
+
+.FormQuote .color .container form select option {
+  background-color: #fcfcfc;
+  color: #1A1B27;
+}
+
+.FormQuote .color .container form .input-group {
+  border: none;
   font-weight: bold;
-  color: #fcfcfc;
-  background-color: transparent !important;
 }
 
-button:disabled {
-  color: #fcfcfc;
+.FormQuote .color .container form button {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.FormQuote .color .container form button:disabled {
   background-color: transparent !important;
 }
-/*# sourceMappingURL=FormQuote.css.map */
+/*# sourceMappingURL=RequestForm.module.css.map */

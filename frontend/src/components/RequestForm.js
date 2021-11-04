@@ -1,16 +1,18 @@
 import styles from "./RequestForm.module.css";
 import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "redaxios";
 
 const RequestForm = () => {
   // set all selectbox option value
+
   const arrCryptoType = [
     {
-      value: "btc",
+      value: "BTC",
       html: "BTC",
     },
-    { value: "eth", html: "ETH" },
+    { value: "ETH", html: "ETH" },
   ];
   const arrOptionType = [
     {
@@ -33,39 +35,35 @@ const RequestForm = () => {
   defaultDate.setDate(defaultDate.getDate() + 1);
   const formObjInit = {
     underlying: "BTC",
+    optionSize: 1,
+    timeHorizon: 1,
+    optionEndDate: defaultDate.toISOString(),
     // optionType: "call",
     // optionPrice: 0,
     // optionCurrency: "usd",
     // optionSide: "buy",
-    optionSize: 1,
-    timeHorizon: 1,
-    optionEndDate: defaultDate.toISOString(),
   };
-
   const [formObj, setFormObj] = useState(formObjInit);
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formObj);
     const form = e.currentTarget;
+    console.log(e);
+    console.log(form);
+    if (form.checkValidity()) {
+      setValidated(true);
+      // let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
+      //   formObj,
+      // });
+      // console.log(cost.data);
 
-    let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
-      formObj,
-    });
-
-    console.log(cost.data);
-
-    // if (form.checkValidity()) {
-    //   setValidated(true);
-    //   await axios.get(`${process.env.REACT_APP_SERVER}/quote`, {
-    //     formObj,
-    //   });
-
-    //   // reset formObj to default
-    //   setFormObj(formObjInit);
-    //   setIsSubmitDisable(false);
-    //   // setValidated(false);
-    // }
-  }
+      // reset formObj to default
+      setFormObj(formObjInit);
+      setIsSubmitDisable(false);
+      setValidated(false);
+    }
+  };
 
   // const handleSubmit = (event) => {
   //   event.preventDefault();
@@ -90,112 +88,78 @@ const RequestForm = () => {
   // };
 
   return (
-    <div className="FormQuote">
-      <div className="color">
+    <div className={styles.FormQuote}>
+      <div className={styles.color}>
         <Container className={styles.container}>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            {/* <Row id="formTitle">
-              <h2 className="mb-3">Crypto Hedging</h2>
-            </Row> */}
             <Row>
               {/* underlying */}
               <Form.Group
                 className="mb-3"
                 as={Col}
-                md="6"
+                md="12"
                 controlId="underlying"
               >
-                <Form.Label>What asset do you hold?</Form.Label>
+                <Form.Label className={styles["form-label"]}>
+                  What asset do you hold?
+                </Form.Label>
                 <Form.Control
+                  name="underlying"
                   as="select"
                   required={true}
                   type="text"
-                  defaultValue="{formObj.underlying}"
+                  value="{formObj.underlying}"
                   onChange={(e) => {
                     setFormObj({ ...formObj, underlying: e.target.value });
+                    console.log(formObj);
                     console.log("formObj.underlying:", formObj.underlying);
                   }}
                 >
                   {arrCryptoType.map((element) => {
                     return (
-                      <option value={element.value}>{element.html}</option>
+                      <option
+                        className={styles["select-option"]}
+                        value={element.value}
+                      >
+                        {element.html}
+                      </option>
                     );
                   })}
                 </Form.Control>
               </Form.Group>
-              {/* optionType */}
-              {/* <Form.Group
-                className="mb-3"
-                as={Col}
-                md="4"
-                controlId="optionType"
-              >
-                <Form.Label>Option Type</Form.Label>
-                <Form.Control
-                  disabled
-                  as="select"
-                  required={true}
-                  type="text"
-                  defaultValue={formObj.optionType}
-                  onChange={(e) => {
-                    setFormObj({ ...formObj, optionType: e.target.value });
-                    console.log("formObj.underlying:", formObj.optionType);
-                  }}
-                >
-                  {arrOptionType.map((element) => {
-                    return (
-                      <option value={element.value}>{element.html}</option>
-                    );
-                  })}
-                </Form.Control>
-              </Form.Group> */}
-              {/* optionSide */}
-              {/* <Form.Group
-                className="mb-3"
-                as={Col}
-                md="4"
-                controlId="optionSide"
-              >
-                <Form.Label>Option Side</Form.Label>
-                <Form.Control
-                  disabled
-                  as="select"
-                  required={true}
-                  type="text"
-                  defaultValue={formObj.optionSide}
-                  onChange={(e) => {
-                    setFormObj({ ...formObj, optionSide: e.target.value });
-                    console.log("formObj.underlying:", formObj.optionSide);
-                  }}
-                >
-                  {arrOptionSide.map((element) => {
-                    return (
-                      <option value={element.value}>{element.html}</option>
-                    );
-                  })}
-                </Form.Control>
-              </Form.Group> */}
               {/* optionSize */}
               <Form.Group
                 className="mb-3"
                 as={Col}
-                md="6"
+                md="12"
                 controlId="optionSize"
               >
-                <Form.Label>What much do you hold?</Form.Label>
+                <Form.Label className={styles["form-label"]}>
+                  How much do you hold?
+                </Form.Label>
                 <InputGroup>
                   <Form.Control
+                    name="optionSize"
                     as="input"
                     required={true}
                     type="number"
-                    defaultValue={formObj.optionSize}
+                    min={0.01}
+                    step="any"
+                    value={formObj.optionSize}
                     onChange={(e) => {
-                      setFormObj({ ...formObj, optionSize: e.target.value });
+                      // handle empty input value
+
+                      e.target.value && e.target.value >= 0.01
+                        ? setFormObj({ ...formObj, optionSize: e.target.value })
+                        : setFormObj({ ...formObj, optionSize: 0.01 });
                       console.log("formObj.underlying:", formObj.optionSize);
                     }}
                     min={1}
                   ></Form.Control>
-                  <InputGroup.Text id="inputGroupCrypto">
+                  <InputGroup.Text
+                    className={styles["input-group"]}
+                    id="inputGroupCrypto"
+                  >
                     {formObj.underlying.toUpperCase()}
                   </InputGroup.Text>
                 </InputGroup>
@@ -204,34 +168,54 @@ const RequestForm = () => {
               <Form.Group
                 className="mb-3"
                 as={Col}
-                md="6"
+                md="12"
                 controlId="timeHorizon"
               >
-                <Form.Label>
+                <Form.Label className={styles["form-label"]}>
                   How long do you want to protect your asset?
                 </Form.Label>
                 <InputGroup hasValidation>
                   <Form.Control
+                    name="timeHorizon"
                     as="input"
                     required={true}
                     type="number"
-                    defaultValue={formObj.timeHorizon}
+                    value={formObj.timeHorizon}
+                    min={1}
+                    step={1}
                     onChange={(e) => {
                       let newDate = new Date();
-                      newDate.setDate(
-                        newDate.getDate() + parseInt(e.target.value)
-                      );
-                      // newDate.toISOString();
+                      // handle empty input value
+                      if (e.target.value) {
+                        newDate.setDate(
+                          newDate.getDate() +
+                            Math.round(parseInt(e.target.value))
+                        );
+                        setFormObj({
+                          ...formObj,
+                          timeHorizon: Math.round(parseInt(e.target.value)),
+                          optionEndDate: newDate.toISOString(),
+                        });
+                      } else {
+                        newDate.setDate(
+                          newDate.getDate() + parseInt(formObjInit.timeHorizon)
+                        );
+
+                        setFormObj({
+                          ...formObj,
+                          timeHorizon: 1,
+                          optionEndDate: newDate.toISOString(),
+                        });
+                      }
+
                       console.log(newDate);
-                      setFormObj({
-                        ...formObj,
-                        timeHorizon: e.target.value,
-                        optionEndDate: newDate.toISOString(),
-                      });
                     }}
                     min={1}
                   ></Form.Control>
-                  <InputGroup.Text id="inputGroupDay">
+                  <InputGroup.Text
+                    className={styles["input-group"]}
+                    id="inputGroupDay"
+                  >
                     Day
                     {formObj.timeHorizon > 1 ? <span>s</span> : null}
                   </InputGroup.Text>
@@ -241,14 +225,21 @@ const RequestForm = () => {
               <Form.Group
                 className="mb-3"
                 as={Col}
-                md="4"
+                md="12"
                 controlId="optionEndDate"
               >
                 <Row>
-                  <Form.Label>End Date</Form.Label>
+                  <Form.Label
+                    name="optionEndDate"
+                    className={styles["form-label"]}
+                  >
+                    Option End Date
+                  </Form.Label>
                 </Row>
                 <Row>
-                  <Form.Label>{formObj.optionEndDate}</Form.Label>
+                  <Form.Label>
+                    {new Date(formObj.optionEndDate).toString()}
+                  </Form.Label>
                 </Row>
               </Form.Group>
             </Row>
@@ -262,30 +253,11 @@ const RequestForm = () => {
                   size="md"
                   type="submit"
                 >
-                  Quote
+                  QUOTE
                 </Button>
               </div>
             </Row>
             <Row>
-              {/* show input value */}
-              {/* <div>
-                <p className="mb-3">
-                  {`Underlying: ${formObj.underlying.toUpperCase()}`}
-                </p>
-                <p>{`Option Type: ${formObj.optionType}`}</p>
-                <p>{`Option Side:  ${formObj.optionSide}`}</p>
-                <p>
-                  {`Option Size: ${
-                    formObj.optionSize
-                  } ${formObj.underlying.toUpperCase()}`}
-                </p>
-                <p>
-                  {`Time Horizon: ${formObj.timeHorizon} Day`}
-                  {formObj.timeHorizon > 1 ? <span>s</span> : null}
-                </p>
-                <p>{`End Date: ${formObj.optionEndDate}`}</p>
-                <p></p>
-              </div> */}
               {/* show json format */}
               {validated && <p>{JSON.stringify(formObj, null, 4)}</p>}
             </Row>
