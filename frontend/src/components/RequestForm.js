@@ -1,7 +1,6 @@
 import styles from "./RequestForm.module.css";
 import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
 import axios from "redaxios";
 
 const RequestForm = () => {
@@ -43,8 +42,8 @@ const RequestForm = () => {
   defaultDate.setDate(defaultDate.getDate() + 1);
   const formObjInit = {
     underlying: "BTC",
-    optionSize: 1,
-    timeHorizon: 1,
+    quantity: 1,
+    expiryDate: 1,
     optionEndDate: defaultDate.toISOString(),
   };
   const [formObj, setFormObj] = useState(formObjInit);
@@ -76,14 +75,14 @@ const RequestForm = () => {
             newErrors[name] = "Please choose an asset.";
           }
           break;
-        case "optionSize":
+        case "quantity":
           if (!obj[name] || obj[name] == "") {
             newErrors[name] = "Amount cannot be empty.";
           } else if (obj[name] < 0.001) {
             newErrors[name] = "Amount cannot be smaller than 0.001.";
           }
           break;
-        case "timeHorizon":
+        case "expiryDate":
           if (!obj[name] || obj[name] == "") {
             newErrors[name] = "Period cannot be empty.";
           } else if (obj[name] < 1) {
@@ -152,30 +151,30 @@ const RequestForm = () => {
                   })}
                 </Form.Control>
               </Form.Group>
-              {/* optionSize */}
+              {/* quantity */}
               <Form.Group
                 className="mb-3"
                 as={Col}
                 md="12"
-                controlId="optionSize"
+                controlId="quantity"
               >
                 <Form.Label className={styles["form-label"]}>
                   How much do you hold?
                 </Form.Label>
                 <InputGroup>
                   <Form.Control
-                    name="optionSize"
+                    name="quantity"
                     as="input"
                     required={true}
                     type="number"
                     step="any"
-                    value={formObj.optionSize}
-                    isInvalid={Object.keys(errors).includes("optionSize")}
+                    value={formObj.quantity}
+                    isInvalid={Object.keys(errors).includes("quantity")}
                     onBlur={(e) => {
-                      setErrors(handleError({ optionSize: e.target.value }));
+                      setErrors(handleError({ quantity: e.target.value }));
                     }}
                     onChange={(e) => {
-                      setFormObj({ ...formObj, optionSize: e.target.value });
+                      setFormObj({ ...formObj, quantity: e.target.value });
                     }}
                   ></Form.Control>
                   <InputGroup.Text
@@ -185,35 +184,35 @@ const RequestForm = () => {
                     {formObj.underlying.toUpperCase()}
                   </InputGroup.Text>
                   <Form.Control.Feedback type="invalid">
-                    {errors.optionSize}
+                    {errors.quantity}
                   </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
-              {/* timeHorizon */}
+              {/* expiryDate */}
               <Form.Group
                 className="mb-3"
                 as={Col}
                 md="12"
-                controlId="timeHorizon"
+                controlId="expiryDate"
               >
                 <Form.Label className={styles["form-label"]}>
                   How long do you want to protect your asset?
                 </Form.Label>
                 <InputGroup hasValidation>
                   <Form.Control
-                    name="timeHorizon"
+                    name="expiryDate"
                     as="input"
                     required={true}
                     type="number"
-                    value={formObj.timeHorizon}
+                    value={formObj.expiryDate}
                     step={1}
                     onBlur={(e) => {
                       setErrors(
-                        handleError({ timeHorizon: formObj.timeHorizon })
+                        handleError({ expiryDate: formObj.expiryDate })
                       );
-                      console.log({ timeHorizon: e.target.value });
+                      console.log({ expiryDate: e.target.value });
                       console.log(errors);
-                      if (!Object.keys(errors).includes("timeHorizon")) {
+                      if (!Object.keys(errors).includes("expiryDate")) {
                         let newDate = new Date();
                         newDate.setDate(
                           newDate.getDate() +
@@ -227,12 +226,12 @@ const RequestForm = () => {
                         });
                       }
                     }}
-                    isInvalid={Object.keys(errors).includes("timeHorizon")}
+                    isInvalid={Object.keys(errors).includes("expiryDate")}
                     onChange={(e) => {
                       let newDate = new Date();
                       setFormObj({
                         ...formObj,
-                        timeHorizon: Math.round(parseInt(e.target.value)),
+                        expiryDate: Math.round(parseInt(e.target.value)),
                       });
                       console.log(newDate);
                     }}
@@ -242,10 +241,10 @@ const RequestForm = () => {
                     id="inputGroupDay"
                   >
                     Day
-                    {formObj.timeHorizon > 1 ? <span>s</span> : null}
+                    {formObj.expiryDate > 1 ? <span>s</span> : null}
                   </InputGroup.Text>
                   <Form.Control.Feedback type="invalid">
-                    {errors.timeHorizon}
+                    {errors.expiryDate}
                   </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
@@ -282,7 +281,7 @@ const RequestForm = () => {
                         );
                         setFormObj({
                           ...formObj,
-                          timeHorizon: dayDiff,
+                          expiryDate: dayDiff,
                         });
                       }
                     }}
