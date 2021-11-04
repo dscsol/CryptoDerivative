@@ -76,8 +76,8 @@ class Router {
   async getPrice(req, res) {
     console.log(req.body);
     let asset = req.body.formObj.underlying;
-    let quantity = req.body.formObj.optionSize;
-    let date = req.body.formObj.optionEndDate;
+    let quantity = req.body.formObj.quantity;
+    let date = req.body.formObj.expiryDate;
 
     //Get all contract
     let url = await GenerateURL("/vapi/v1/optionInfo", "", "");
@@ -126,7 +126,8 @@ class Router {
     };
     let markPrice = await axios(markPriceRequestConfig);
     let cost = markPrice.data.data[0].markPrice * quantity;
-    res.send(`${cost}`);
+    let expiryDate = sortStrike[0].expiryDate;
+    res.send(JSON.stringify({ cost: cost, expiryDate: expiryDate }));
     // res.end();
   }
 

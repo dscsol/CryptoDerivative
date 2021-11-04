@@ -35,8 +35,8 @@ const RequestForm = () => {
   defaultDate.setDate(defaultDate.getDate() + 1);
   const formObjInit = {
     underlying: "BTC",
-    optionSize: 1,
-    timeHorizon: 1,
+    quantity: 1,
+    expiryDate: 1,
     optionEndDate: defaultDate.toISOString(),
     // optionType: "call",
     // optionPrice: 0,
@@ -53,10 +53,10 @@ const RequestForm = () => {
     console.log(form);
     if (form.checkValidity()) {
       setValidated(true);
-      // let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
-      //   formObj,
-      // });
-      // console.log(cost.data);
+      let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
+        formObj,
+      });
+      console.log(cost.data);
 
       // reset formObj to default
       setFormObj(formObjInit);
@@ -127,32 +127,32 @@ const RequestForm = () => {
                   })}
                 </Form.Control>
               </Form.Group>
-              {/* optionSize */}
+              {/* quantity */}
               <Form.Group
                 className="mb-3"
                 as={Col}
                 md="12"
-                controlId="optionSize"
+                controlId="quantity"
               >
                 <Form.Label className={styles["form-label"]}>
                   How much do you hold?
                 </Form.Label>
                 <InputGroup>
                   <Form.Control
-                    name="optionSize"
+                    name="quantity"
                     as="input"
                     required={true}
                     type="number"
                     min={0.01}
                     step="any"
-                    value={formObj.optionSize}
+                    value={formObj.quantity}
                     onChange={(e) => {
                       // handle empty input value
 
                       e.target.value && e.target.value >= 0.01
-                        ? setFormObj({ ...formObj, optionSize: e.target.value })
-                        : setFormObj({ ...formObj, optionSize: 0.01 });
-                      console.log("formObj.underlying:", formObj.optionSize);
+                        ? setFormObj({ ...formObj, quantity: e.target.value })
+                        : setFormObj({ ...formObj, quantity: 0.01 });
+                      console.log("formObj.underlying:", formObj.quantity);
                     }}
                     min={1}
                   ></Form.Control>
@@ -164,23 +164,23 @@ const RequestForm = () => {
                   </InputGroup.Text>
                 </InputGroup>
               </Form.Group>
-              {/* timeHorizon */}
+              {/* expiryDate */}
               <Form.Group
                 className="mb-3"
                 as={Col}
                 md="12"
-                controlId="timeHorizon"
+                controlId="expiryDate"
               >
                 <Form.Label className={styles["form-label"]}>
                   How long do you want to protect your asset?
                 </Form.Label>
                 <InputGroup hasValidation>
                   <Form.Control
-                    name="timeHorizon"
+                    name="expiryDate"
                     as="input"
                     required={true}
                     type="number"
-                    value={formObj.timeHorizon}
+                    value={formObj.expiryDate}
                     min={1}
                     step={1}
                     onChange={(e) => {
@@ -193,17 +193,17 @@ const RequestForm = () => {
                         );
                         setFormObj({
                           ...formObj,
-                          timeHorizon: Math.round(parseInt(e.target.value)),
+                          expiryDate: Math.round(parseInt(e.target.value)),
                           optionEndDate: newDate.toISOString(),
                         });
                       } else {
                         newDate.setDate(
-                          newDate.getDate() + parseInt(formObjInit.timeHorizon)
+                          newDate.getDate() + parseInt(formObjInit.expiryDate)
                         );
 
                         setFormObj({
                           ...formObj,
-                          timeHorizon: 1,
+                          expiryDate: 1,
                           optionEndDate: newDate.toISOString(),
                         });
                       }
@@ -217,7 +217,7 @@ const RequestForm = () => {
                     id="inputGroupDay"
                   >
                     Day
-                    {formObj.timeHorizon > 1 ? <span>s</span> : null}
+                    {formObj.expiryDate > 1 ? <span>s</span> : null}
                   </InputGroup.Text>
                 </InputGroup>
               </Form.Group>
