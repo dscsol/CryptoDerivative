@@ -151,50 +151,6 @@ class Router {
     );
   }
 
-  async transferToOption(req, res) {
-    let asset = req.body.asset;
-    let quantity = req.body.quantity;
-    let walletID = req.body.walletID;
-    let userID = await this.Method.getUserID(walletID);
-    let queryString = `currency=USDT&type=IN&amount=${quantity}&recvWindow=20000&timestamp=${timestamp}`;
-    let signature = await GenerateSignature(
-      queryString,
-      process.env.SECRET_KEY
-    );
-    let url = await GenerateURL(
-      process.env.URL_OPTION,
-      "/vapi/v1/transfer",
-      queryString,
-      signature
-    );
-    let requestConfig = {
-      method: "post",
-      url: url,
-      headers: {
-        "X-MBX-APIKEY": `${process.env.API_KEY}`,
-      },
-    };
-    let response = await axios(requestConfig);
-
-    let data = {
-      tranxType: "TRANSFER",
-      exchange: "BINANCE",
-      exchangeOrderID: response.data.data,
-      asset: asset,
-      expiryDate: "n/a",
-      orderSide: "n/a",
-      orderType: "n/a",
-      quantity: quantity,
-      price: "n/a",
-      currency: "n/a",
-      orderStatus: response.data.msg,
-      userID: userID,
-    };
-
-    await this.Method.getUserID(data);
-    res.end();
-  }
-
   async buy(req, res) {
     //Add temp deposit record for cross checking
     let walletID = req.body.walletID;
@@ -213,48 +169,8 @@ class Router {
       orderStatus: "pending",
       userID: userID,
     });
-    await this.Method.addTransactionsRecord(transaction);
-    //Track deposit from Binance
-    let minus5min = Date.now() - 300000;
-    let queryString = `startTime=${minus5min.toString()}&recvWindow=60000&timestamp=${timestamp}`;
-    let signature = await GenerateSignature(
-      queryString,
-      process.env.SECRET_KEY
-    );
-    let url = await GenerateURL(
-      process.env.URL_SPOT,
-      "/sapi/v1/capital/deposit/hisrec",
-      queryString,
-      signature
-    );
-    let requestConfig = {
-      method: "get",
-      url: url,
-      headers: {
-        "X-MBX-APIKEY": `${process.env.API_KEY}`,
-      },
-    };
-    //Keep checking deposit status for 2 minutes
-    while (Date.now() <= parseInt(timestamp) + 120000) {
-      let response = await axios(requestConfig);
-      let filterTransaction = response.data.filter((x) => {
-        return (
-          x.address == walletID &&
-          x.coin == req.body.depositAsset &&
-          x.amount == req.body.quantity &&
-          x.status == 1
-        );
-      });
-      //deposit successful
-      if (filterTransaction[0]) {
-        await this.Method.updateDepositStatus(walletID);
-        break;
-      }
-    }
-  }
-
-  async test(req, res) {
-    // Listen to account changes
+    let id = await this.Method.addTransactionsRecord(transaction);
+    // Generate account streaming listening key
     let time = Date.now();
     let url = await GenerateURL(
       process.env.URL_SPOT,
@@ -270,6 +186,7 @@ class Router {
       },
     };
     let listenKey = await axios(requestConfig);
+    //Listen to account activitiese
     let accountActivities = [];
     const callbacks = {
       open: () => client.logger.debug("open"),
@@ -281,7 +198,7 @@ class Router {
     };
     const screamAC = client.userData(listenKey.data.listenKey, callbacks);
     setTimeout(() => client.unsubscribe(screamAC), 60000);
-
+    //Match activities with request deposit amount
     if (accountActivities[0]) {
       for (each of accountActivities) {
         if ((each.d = req.body.quantity)) {
@@ -292,12 +209,12 @@ class Router {
           let filterTransaction = transactions.data.filter((x) => {
             return (x.amount = req.body.quantity);
           });
-
           let txID = filterTransaction[0].txId;
+          //Search transaction history of the request walletID
           let urlBSC = await GenerateURL(
             process.env.URL_BSC,
             "/api",
-            `module=account&action=txlist&address=${req.body.walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
+            `module=account&action=txlist&address=${walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
             null
           );
           let requestConfigBSC = {
@@ -305,11 +222,39 @@ class Router {
             url: urlBSC,
           };
           let sendingAddress = await axios(requestConfigBSC);
+          //Match deposit transaction by txID
           let findMatch = sendingAddress.data.result.filter((x) => {
             return x.hash == txID;
           });
           if (findMatch[0]) {
-            console.log("BUY!!!");
+            await this.Method.updateDepositStatus(id);
+            //Move deposit from spot to option account
+            let queryString = `currency=${req.body.asset}&type=IN&amount=${
+              req.body.quantity
+            }&recvWindow=20000&timestamp=${Date.now()}`;
+            let signature = await GenerateSignature(
+              queryString,
+              process.env.SECRET_KEY
+            );
+            let url = await GenerateURL(
+              process.env.URL_OPTION,
+              "/vapi/v1/transfer",
+              queryString,
+              signature
+            );
+            let requestConfig = {
+              method: "post",
+              url: url,
+              headers: {
+                "X-MBX-APIKEY": `${process.env.API_KEY}`,
+              },
+            };
+            let response = await axios(requestConfig);
+            if (response.data.msg == "success") {
+              //Buy options
+              console.log("buy");
+            }
+
             accountActivities = [];
           } else if (Date.now() > time + 60000) {
             res.send("transaction timeout");
@@ -323,6 +268,76 @@ class Router {
       accountActivities = [];
       res.send("transaction timeout");
     }
+  }
+
+  async test(req, res) {
+    // // Listen to account changes
+    // let time = Date.now();
+    // let url = await GenerateURL(
+    //   process.env.URL_SPOT,
+    //   "/api/v3/userDataStream",
+    //   null,
+    //   null
+    // );
+    // let requestConfig = {
+    //   method: "post",
+    //   url: url,
+    //   headers: {
+    //     "X-MBX-APIKEY": `${process.env.API_KEY}`,
+    //   },
+    // };
+    // let listenKey = await axios(requestConfig);
+    // let accountActivities = [];
+    // const callbacks = {
+    //   open: () => client.logger.debug("open"),
+    //   close: () => client.logger.debug("closed"),
+    //   message: (data) => {
+    //     client.logger.log(data);
+    //     accountActivities.push(JSON.parse(data));
+    //   },
+    // };
+    // const screamAC = client.userData(listenKey.data.listenKey, callbacks);
+    // setTimeout(() => client.unsubscribe(screamAC), 60000);
+    // if (accountActivities[0]) {
+    //   for (each of accountActivities) {
+    //     if ((each.d = req.body.quantity)) {
+    //       let transactions = await client.depositHistory({
+    //         coin: req.body.depositAsset,
+    //         status: 1,
+    //       });
+    //       let filterTransaction = transactions.data.filter((x) => {
+    //         return (x.amount = req.body.quantity);
+    //       });
+    //       let txID = filterTransaction[0].txId;
+    //       let urlBSC = await GenerateURL(
+    //         process.env.URL_BSC,
+    //         "/api",
+    //         `module=account&action=txlist&address=${walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
+    //         null
+    //       );
+    //       let requestConfigBSC = {
+    //         method: "post",
+    //         url: urlBSC,
+    //       };
+    //       let sendingAddress = await axios(requestConfigBSC);
+    //       let findMatch = sendingAddress.data.result.filter((x) => {
+    //         return x.hash == txID;
+    //       });
+    //       if (findMatch[0]) {
+    //         console.log("BUY!!!");
+    //         accountActivities = [];
+    //       } else if (Date.now() > time + 60000) {
+    //         res.send("transaction timeout");
+    //       }
+    //     } else if (Date.now() > time + 60000) {
+    //       accountActivities = [];
+    //       res.send("transaction timeout");
+    //     }
+    //   }
+    // } else if (!accountActivities[0] && Date.now() > time + 60000) {
+    //   accountActivities = [];
+    //   res.send("transaction timeout");
+    // }
   }
 }
 module.exports = Router;
