@@ -9,7 +9,12 @@ import RequestForm from "./components/RequestForm";
 function App() {
   let dispatch = useDispatch();
 
+  async function fetch() {
+    await axios.get(`${process.env.REACT_APP_SERVER}/test`);
+  }
+
   useEffect(() => {
+    fetch();
     window.onload = async function () {
       let data = await web3.eth.getAccounts();
       if (data[0]) {
