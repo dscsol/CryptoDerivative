@@ -5,36 +5,32 @@ import axios from "redaxios";
 
 const RequestForm = () => {
   // set all selectbox option value
-
   const arrCryptoType = [
-    {
-      value: "BTC",
-      html: "BTC",
-    },
+    { value: "BTC", html: "BTC" },
     { value: "ETH", html: "ETH" },
   ];
-  const arrOptionType = [
-    {
-      value: "call",
-      html: "Call",
-    },
-    // {
-    //   value: "put",
-    //   html: "Put",
-    // },
-  ];
-  const arrOptionSide = [{ value: "buy", html: "Buy" }];
+  // const arrOptionType = [
+  //   {
+  //     value: "call",
+  //     html: "Call",
+  //   },
+  //   // {
+  //   //   value: "put",
+  //   //   html: "Put",
+  //   // },
+  // ];
+  // const arrOptionSide = [{ value: "buy", html: "Buy" }];
 
-  const isLeapYear = (year) => {
-    return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
-  };
-  const days_of_a_year = (year) => {
-    return isLeapYear(year) ? 366 : 365;
-  };
+  // const isLeapYear = (year) => {
+  //   return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
+  // };
+  // const days_of_a_year = (year) => {
+  //   return isLeapYear(year) ? 366 : 365;
+  // };
 
   // set all var state
   const [validated, setValidated] = useState(false);
-  const [isSubmitDisable, setIsSubmitDisable] = useState(false);
+  // const [isSubmitDisable, setIsSubmitDisable] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Set state as a whole object
@@ -52,42 +48,34 @@ const RequestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors(handleError(formObj));
-    if (Object.keys(errors).length == 0) {
+    if (Object.keys(errors).length === 0) {
       setValidated(true);
       let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
         formObj,
       });
-
       setQuote(cost.data);
-
-      // reset formObj to default
-      // setFormObj(formObjInit);
-      // setIsSubmitDisable(false);
-      // setValidated(false);
     }
   };
-
-  console.log(quote);
 
   // input validation, return as obj
   const handleError = (obj) => {
     let newErrors = {};
-    Object.keys(obj).map((name) => {
+    Object.keys(obj).forEach((name) => {
       switch (name) {
         case "underlying":
-          if (!obj[name] || obj[name] == "") {
+          if (!obj[name] || obj[name] === "") {
             newErrors[name] = "Please choose an asset.";
           }
           break;
         case "quantity":
-          if (!obj[name] || obj[name] == "") {
+          if (!obj[name] || obj[name] === "") {
             newErrors[name] = "Amount cannot be empty.";
           } else if (obj[name] < 0.001) {
             newErrors[name] = "Amount cannot be smaller than 0.001.";
           }
           break;
         case "expiryDate":
-          if (!obj[name] || obj[name] == "") {
+          if (!obj[name] || obj[name] === "") {
             newErrors[name] = "Period cannot be empty.";
           } else if (obj[name] < 1) {
             newErrors[name] = "Minimum period is 1 day.";
@@ -96,7 +84,7 @@ const RequestForm = () => {
           }
           break;
         case "optionEndDate":
-          if (!obj[name] || obj[name] == "") {
+          if (!obj[name] || obj[name] === "") {
             newErrors[name] = "Period cannot be empty.";
           } else {
             let dayDiff = Math.ceil(
@@ -110,6 +98,8 @@ const RequestForm = () => {
             }
           }
           break;
+        default:
+          newErrors = {};
       }
     });
     return newErrors;
@@ -146,6 +136,7 @@ const RequestForm = () => {
                   {arrCryptoType.map((element) => {
                     return (
                       <option
+                        key={arrCryptoType.indexOf(element)}
                         className={styles["select-option"]}
                         value={element.value}
                       >
@@ -253,7 +244,7 @@ const RequestForm = () => {
                 </InputGroup>
               </Form.Group>
               {/* optionEndDate */}
-              <Form.Group
+              {/* <Form.Group
                 className="mb-3"
                 as={Col}
                 md="12"
@@ -317,13 +308,13 @@ const RequestForm = () => {
                     {errors.optionEndDate}
                   </Form.Control.Feedback>
                 </InputGroup>
-              </Form.Group>
+              </Form.Group> */}
             </Row>
             <Row>
               {/* submit button */}
               <div className=" mb-3 d-grid gap-2">
                 <Button
-                  disabled={isSubmitDisable}
+                  // disabled={isSubmitDisable}
                   id="btnQuote"
                   variant="primary"
                   size="md"
