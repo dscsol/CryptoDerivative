@@ -5,6 +5,7 @@ import { changeFormQuote } from "../redux/quoteFormSlice";
 import { DateTime } from "luxon";
 import axios from "redaxios";
 
+// custom hook for form handling
 const useForm = (submitForm, validate) => {
   const form = useSelector((state) => state.quoteForm);
   const dispatch = useDispatch();
@@ -21,12 +22,13 @@ const useForm = (submitForm, validate) => {
     }
   };
 
+  // set errors and is submit when submit is click
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors(validate(form));
     setIsSubmit(true);
   };
-
+  // take period and dispatch endDate
   const addDateToISO = ({ dt = DateTime.now(), period }) => {
     try {
       let newDate = dt.plus({ days: period });
@@ -37,23 +39,7 @@ const useForm = (submitForm, validate) => {
       console.error(e);
     }
   };
-
-  useEffect(async () => {
-    if (Object.keys(errors).length === 0 && isSubmit) {
-      addDateToISO({ period: form.period });
-      submitForm();
-      console.log("success");
-      // console.log(`${process.env.REACT_APP_SERVER}/quote`);
-      // let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
-      //   underlying: form.underlying,
-      //   quantity: form.quantity,
-      //   expiryDate: form.endDate,
-      // });
-      // console.log("cost: ", cost);
-      axiosQuote();
-    }
-  }, [errors]);
-
+  // axios get quote from Binance
   const axiosQuote = async () => {
     axios.defaults.baseURL = process.env.REACT_APP_SERVER;
     let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
@@ -63,6 +49,16 @@ const useForm = (submitForm, validate) => {
     });
     console.log("cost: ", cost);
   };
+
+  // listen Errors, if no errors then submit
+  useEffect(async () => {
+    if (Object.keys(errors).length === 0 && isSubmit) {
+      addDateToISO({ period: form.period });
+      submitForm();
+      console.log("success");
+      axiosQuote();
+    }
+  }, [errors]);
 
   return { handleChange, handleSubmit, addDateToISO, errors };
 };
