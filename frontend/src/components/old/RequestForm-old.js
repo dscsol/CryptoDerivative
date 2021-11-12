@@ -1,59 +1,62 @@
-import styles from "./RequestForm.module.sass";
-import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
-import { useState } from "react";
-import axios from "redaxios";
-import FormInput from "./FormInput";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  changeUnderlying,
-  changeQuantity,
-  changeExpiryDate,
-  changeOptionEndDate,
-} from "../../redux/quoteFormSlice";
+// import styles from "./RequestForm.module.sass";
+// import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
+// import { useState } from "react";
+// import axios from "redaxios";
+// import FormInput from "./FormInput";
+// import { useSelector, useDispatch } from "react-redux";
+// import {
+//   changeUnderlying,
+//   changeQuantity,
+//   changeExpiryDate,
+//   changeOptionEndDate,
+// } from "../../redux/quoteFormSlice";
 
-const RequestForm = () => {
-  const form = useSelector((state) => state.quoteForm);
-  const dispatch = useDispatch();
-  // set all selectbox option value
-  const arrCryptoType = [
-    { value: "BTC", html: "BTC" },
-    { value: "ETH", html: "ETH" },
-  ];
-  // const arrOptionType = [
-  //   {
-  //     value: "call",
-  //     html: "Call",
-  //   },
-  //   // {
-  //   //   value: "put",
-  //   //   html: "Put",
-  //   // },
-  // ];
-  // const arrOptionSide = [{ value: "buy", html: "Buy" }];
+// const RequestForm = () => {
+//   const form = useSelector((state) => state.quoteForm);
+//   const dispatch = useDispatch();
+//   // set all selectbox option value
+//   const arrCryptoType = [
+//     {
+//       value: "BTC",
+//       html: "BTC",
+//     },
+//     { value: "ETH", html: "ETH" },
+//   ];
+//   const arrOptionType = [
+//     {
+//       value: "call",
+//       html: "Call",
+//     },
+//     // {
+//     //   value: "put",
+//     //   html: "Put",
+//     // },
+//   ];
+//   const arrOptionSide = [{ value: "buy", html: "Buy" }];
 
-  // const isLeapYear = (year) => {
-  //   return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
-  // };
-  // const days_of_a_year = (year) => {
-  //   return isLeapYear(year) ? 366 : 365;
-  // };
+//   const isLeapYear = (year) => {
+//     return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
+//   };
+//   const days_of_a_year = (year) => {
+//     return isLeapYear(year) ? 366 : 365;
+//   };
 
-  // set all var state
-  const [validated, setValidated] = useState(false);
-  // const [isSubmitDisable, setIsSubmitDisable] = useState(false);
-  const [errors, setErrors] = useState({});
+//   // set all var state
+//   const [validated, setValidated] = useState(false);
+//   const [isSubmitDisable, setIsSubmitDisable] = useState(false);
+//   const [errors, setErrors] = useState({});
 
-  // Set state as a whole object
-  let defaultDate = new Date();
-  defaultDate.setDate(defaultDate.getDate() + 1);
-  const formObjInit = {
-    underlying: "BTC",
-    quantity: 1,
-    expiryDate: 1,
-    optionEndDate: defaultDate.toISOString(),
-  };
-  const [formObj, setFormObj] = useState(formObjInit);
-  const [quote, setQuote] = useState("");
+//   // Set state as a whole object
+//   let defaultDate = new Date();
+//   defaultDate.setDate(defaultDate.getDate() + 1);
+//   const formObjInit = {
+//     underlying: "BTC",
+//     quantity: 1,
+//     expiryDate: 1,
+//     optionEndDate: defaultDate.toISOString(),
+//   };
+//   const [formObj, setFormObj] = useState(formObjInit);
+//   const [quote, setQuote] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -319,78 +322,78 @@ const RequestForm = () => {
               </div>
             </Row>
 
-            <p>
-              {quote
-                ? `Your asset will be protected until ${new Date(
-                    quote.expiryDate
-                  ).toLocaleString()}, the total cost will be US$${quote.cost}`
-                : null}
-            </p>
-          </Form>
-        </Container>
-      </div>
-    </div>
-  );
-};
+//             <p>
+//               {quote
+//                 ? `Your asset will be protected until ${new Date(
+//                     quote.expiryDate
+//                   ).toLocaleString()}, the total cost will be US$${quote.cost}`
+//                 : null}
+//             </p>
+//           </Form>
+//         </Container>
+//       </div>
+//     </div>
+//   );
+// };
 
-export default RequestForm;
+// export default RequestForm;
 
-{
-  /* optionEndDate */
-}
-{
-  <Form.Group className="mb-3" as={Col} md="12" controlId="optionEndDate">
-    <Form.Label className={styles["form-label"]}>Option End Date</Form.Label>
-    <InputGroup hasValidation>
-      <Form.Control
-        className={styles["optionEndDate"]}
-        name="optionEndDate"
-        as="input"
-        required={true}
-        type="date"
-        value={formObj.optionEndDate.substring(0, 10)}
-        min={formObjInit.optionEndDate.substring(0, 10)}
-        max={
-          parseInt(formObjInit.optionEndDate.substring(0, 4)) +
-          4 +
-          formObjInit.optionEndDate.substring(4, 10)
-        }
-        onBlur={(e) => {
-          setErrors(handleError({ optionEndDate: e.target.value }));
-          if (!Object.keys(errors).includes("optionEndDate")) {
-            let dayDiff = Math.ceil(
-              (new Date(e.target.value) - new Date()) / (1000 * 60 * 60 * 24)
-            );
-            setFormObj({
-              ...formObj,
-              expiryDate: dayDiff,
-            });
-          }
-        }}
-        onChange={(e) => {
-          setErrors(handleError({ optionEndDate: e.target.value }));
-          if (!Object.keys(errors).includes("optionEndDate")) {
-            let newDate = new Date();
-            newDate.setDate(
-              newDate.getDate() + Math.round(parseInt(e.target.value))
-            );
-            setFormObj({
-              ...formObj,
-              optionEndDate: new Date(e.target.value).toISOString(),
-            });
-          }
-        }}
-        isInvalid={Object.keys(errors).includes("optionEndDate")}
-      ></Form.Control>
-      <InputGroup.Text
-        className={styles["input-group"]}
-        id={styles["inputGroupTimeZone"]}
-      >
-        {`0:00AM ${new Date(formObj.optionEndDate).toString().substring(25)}`}
-      </InputGroup.Text>
-      <Form.Control.Feedback type="invalid">
-        {errors.optionEndDate}
-      </Form.Control.Feedback>
-    </InputGroup>
-  </Form.Group>;
-}
+// {
+//   /* optionEndDate */
+// }
+// {
+//   <Form.Group className="mb-3" as={Col} md="12" controlId="optionEndDate">
+//     <Form.Label className={styles["form-label"]}>Option End Date</Form.Label>
+//     <InputGroup hasValidation>
+//       <Form.Control
+//         className={styles["optionEndDate"]}
+//         name="optionEndDate"
+//         as="input"
+//         required={true}
+//         type="date"
+//         value={formObj.optionEndDate.substring(0, 10)}
+//         min={formObjInit.optionEndDate.substring(0, 10)}
+//         max={
+//           parseInt(formObjInit.optionEndDate.substring(0, 4)) +
+//           4 +
+//           formObjInit.optionEndDate.substring(4, 10)
+//         }
+//         onBlur={(e) => {
+//           setErrors(handleError({ optionEndDate: e.target.value }));
+//           if (!Object.keys(errors).includes("optionEndDate")) {
+//             let dayDiff = Math.ceil(
+//               (new Date(e.target.value) - new Date()) / (1000 * 60 * 60 * 24)
+//             );
+//             setFormObj({
+//               ...formObj,
+//               expiryDate: dayDiff,
+//             });
+//           }
+//         }}
+//         onChange={(e) => {
+//           setErrors(handleError({ optionEndDate: e.target.value }));
+//           if (!Object.keys(errors).includes("optionEndDate")) {
+//             let newDate = new Date();
+//             newDate.setDate(
+//               newDate.getDate() + Math.round(parseInt(e.target.value))
+//             );
+//             setFormObj({
+//               ...formObj,
+//               optionEndDate: new Date(e.target.value).toISOString(),
+//             });
+//           }
+//         }}
+//         isInvalid={Object.keys(errors).includes("optionEndDate")}
+//       ></Form.Control>
+//       <InputGroup.Text
+//         className={styles["input-group"]}
+//         id={styles["inputGroupTimeZone"]}
+//       >
+//         {`0:00AM ${new Date(formObj.optionEndDate).toString().substring(25)}`}
+//       </InputGroup.Text>
+//       <Form.Control.Feedback type="invalid">
+//         {errors.optionEndDate}
+//       </Form.Control.Feedback>
+//     </InputGroup>
+//   </Form.Group>;
+// }
