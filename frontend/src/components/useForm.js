@@ -59,9 +59,9 @@ const useForm = (submitForm, validate) => {
     let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
       underlying: form.underlying,
       quantity: form.quantity,
-      expiryDate: form.endDate,
+      expiryDate: new Date(form.endDate).getTime(),
     });
-    console.log(cost);
+    console.log("cost: ", cost);
   };
 
   return { handleChange, handleSubmit, addDateToISO, errors };

@@ -4,6 +4,7 @@ import { addWallet } from "./redux/walletSlice";
 import web3 from "./web3";
 import { useEffect } from "react";
 import Form from "./components/Form";
+import axios from "redaxios";
 
 function App() {
   let dispatch = useDispatch();

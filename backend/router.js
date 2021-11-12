@@ -86,7 +86,7 @@ class Router {
     let asset = req.body.underlying;
     let quantity = req.body.quantity;
     let date = req.body.expiryDate;
-
+    console.log(asset, " ", quantity, " ", date);
     //Get all contract
     let url = await GenerateURL(
       process.env.URL_OPTION,
