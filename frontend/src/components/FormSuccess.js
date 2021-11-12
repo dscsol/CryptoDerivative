@@ -6,11 +6,10 @@ const FormSuccess = () => {
   return (
     <div>
       {Object.keys(form).map((name) => {
-        console.log(name);
-        return (
-          <p>
-            {name}: {form[name]}
-          </p>
+        return name != "endDate" ? (
+          <p>{`${name}: ${form[name]}`}</p>
+        ) : (
+          <p>{`${name}: ${new Date(form[name]).toString()}`}</p>
         );
       })}
     </div>
