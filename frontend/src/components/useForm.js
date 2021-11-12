@@ -20,6 +20,7 @@ const useForm = (submitForm, validate) => {
     setErrors(validate(form));
     setIsSubmit(true);
   };
+
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmit) {
       submitForm();
