@@ -1,18 +1,15 @@
 import React from "react";
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
-import axios from "redaxios";
-import { DateTime } from "luxon";
+import { useSelector } from "react-redux";
+import { Form, Button, InputGroup } from "react-bootstrap";
+// import { DateTime } from "luxon";
 import validate from "./validate";
 
 import useForm from "./useForm";
 
 const FormQuote = ({ submitForm }) => {
   // init
-  const dt = DateTime.now();
+  // const dt = DateTime.now();
   const form = useSelector((state) => state.quoteForm);
-  const formInit = form;
 
   const { handleChange, handleSubmit, errors } = useForm(submitForm, validate);
 
