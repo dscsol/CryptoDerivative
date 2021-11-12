@@ -1,10 +1,10 @@
 import Nav from "./components/Nav";
-import axios from "redaxios";
 import { useDispatch } from "react-redux";
 import { addWallet } from "./redux/walletSlice";
 import web3 from "./web3";
 import { useEffect } from "react";
 import RequestForm from "./components/RequestForm";
+import Form from "./components/Form";
 
 function App() {
   let dispatch = useDispatch();
@@ -21,7 +21,8 @@ function App() {
   return (
     <div className="App">
       <Nav />
-      <RequestForm />
+      {/* <RequestForm /> */}
+      <Form />
     </div>
   );
 }
