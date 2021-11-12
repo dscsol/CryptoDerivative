@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
 import { changeFormQuote } from "../redux/quoteFormSlice";
 import { DateTime } from "luxon";
+import axios from "redaxios";
 
 const useForm = (submitForm, validate) => {
   const form = useSelector((state) => state.quoteForm);
@@ -19,11 +19,12 @@ const useForm = (submitForm, validate) => {
       addDateToISO({ period: value });
     }
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors(validate(form));
     setIsSubmit(true);
   };
+
   const addDateToISO = ({ dt = DateTime.now(), period }) => {
     try {
       let newDate = dt.plus({ days: period });
