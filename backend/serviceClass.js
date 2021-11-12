@@ -29,23 +29,35 @@ class Method {
   }
 
   async addTransactionsRecord(data) {
-    let id = await knex("users").select("id").where("walletID", walletID);
-    await knex
+    let parseData = JSON.parse(data);
+
+    console.log(parseData);
+    let id = await knex
       .insert({
-        tranxType: data.tranxType,
-        exchange: data.exchange,
-        exchangeOrderID: data.exchangeOrderID,
-        asset: data.asset,
-        expiryDate: data.expiryDate,
+        tranxType: parseData.tranxType,
+        exchange: parseData.exchange,
+        exchangeOrderID: parseData.exchangeOrderID,
+        asset: parseData.asset,
+        expiryDate: parseData.expiryDate,
         orderSide: data.orderSide,
-        orderType: data.orderType,
-        quantity: data.quantity,
-        price: data.price,
-        currency: data.currency,
-        orderStatus: data.orderStatus,
-        userID: id[0],
+        orderType: parseData.orderType,
+        quantity: parseData.quantity,
+        price: parseData.price,
+        currency: parseData.currency,
+        orderStatus: parseData.orderStatus,
+        userID: parseData.userID,
       })
-      .into("transactions");
+      .into("transactions")
+      .returning("id");
+    return id[0];
+  }
+
+  async updateDepositStatus(id) {
+    await knex("transactions")
+      .update({
+        orderStatus: "success",
+      })
+      .where("id", id);
   }
 }
 module.exports = Method;
