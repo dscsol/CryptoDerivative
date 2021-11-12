@@ -63,7 +63,7 @@
 }
 
 .FormQuote .color .container form .optionEndDate {
-  min-width: 180px;
+  min-width: 200px;
 }
 
 .FormQuote .color .container form .optionEndDate::-webkit-calendar-picker-indicator {
