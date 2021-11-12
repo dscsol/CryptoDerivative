@@ -254,7 +254,6 @@ class Router {
               //Buy options
               console.log("buy");
             }
-
             accountActivities = [];
           } else if (Date.now() > time + 60000) {
             res.send("transaction timeout");
