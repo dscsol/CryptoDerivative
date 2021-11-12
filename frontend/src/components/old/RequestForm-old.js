@@ -57,24 +57,6 @@ const RequestForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-<<<<<<< HEAD:frontend/src/components/old/RequestForm-old.js
-    console.log(form);
-    // setErrors(handleError(formObj));
-    // if (Object.keys(errors).length == 0) {
-    //   setValidated(true);
-    //   let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
-    //     formObj,
-    //   });
-
-    //   setQuote(cost.data);
-
-    //   // reset formObj to default
-    //   // setFormObj(formObjInit);
-    //   // setIsSubmitDisable(false);
-    //   // setValidated(false);
-    // }
-======
->>>>>>> 9994d0daa328bcccc56ed37def2c3999529889e8:frontend/src/components/RequestForm.js
   };
 
   // input validation, return as obj
