@@ -2,14 +2,14 @@ import styles from "./RequestForm.module.sass";
 import { Form, Col, Row, Button, Container, InputGroup } from "react-bootstrap";
 import { useState } from "react";
 import axios from "redaxios";
-import FormInput from "./FormInput";
+import FormInput from "../FormInput";
 import { useSelector, useDispatch } from "react-redux";
 import {
   changeUnderlying,
   changeQuantity,
   changeExpiryDate,
   changeOptionEndDate,
-} from "../redux/quoteFormSlice";
+} from "../../redux/quoteFormSlice";
 
 const RequestForm = () => {
   const form = useSelector((state) => state.quoteForm);
