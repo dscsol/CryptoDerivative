@@ -50,7 +50,6 @@ const FormQuote = ({ submitForm }) => {
             required
           />
           <InputGroup.Text>{form.underlying}</InputGroup.Text>
-          {/* why is this not fucking work? */}
           <Form.Control.Feedback type="invalid">
             {errors.quantity}
           </Form.Control.Feedback>
@@ -75,6 +74,8 @@ const FormQuote = ({ submitForm }) => {
           </Form.Control.Feedback>
         </InputGroup>
       </Form.Group>
+      {/* endDate */}
+      <p>{new Date(form.endDate).toString()}</p>
 
       {/* submit button */}
       <div className=" mb-3 d-grid gap-2">
