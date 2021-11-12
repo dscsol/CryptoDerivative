@@ -12,7 +12,7 @@ export default function validate(values) {
     errors.period = "Period is require";
   } else if (values.period < 1) {
     errors.period = "Period must more than 1 day";
-  } else if (values.period % 1 < 0) {
+  } else if (values.period % 1 > 0) {
     errors.period = "Period must not have decimal";
   }
   return errors;
