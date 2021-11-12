@@ -1,7 +1,6 @@
 const express = require("express");
 const axios = require("axios");
 const crypto = require("crypto");
-const timestamp = Date.now().toString();
 require("dotenv").config();
 
 //SPOT
@@ -59,7 +58,7 @@ class Router {
   }
 
   async OptionAccountBalance(req, res) {
-    let queryString = `recvWindow=60000&timestamp=${timestamp}`;
+    let queryString = `recvWindow=20000&timestamp=${Date.now()}`;
     let signature = await GenerateSignature(
       queryString,
       process.env.SECRET_KEY
@@ -78,7 +77,8 @@ class Router {
       },
     };
     let response = await axios(requestConfig);
-    res.send(response.data.data[0]);
+    console.log(response.data);
+    res.send(response.data.data);
   }
 
   async getPrice(req, res) {
@@ -147,15 +147,20 @@ class Router {
     let cost = markPrice.data.data[0].markPrice * quantity;
     let expiryDate = sortStrike[0].expiryDate;
     let symbol = sortStrike[0].symbol;
+    let price = sortStrike[0].markPrice;
     res.send(
-      JSON.stringify({ cost: cost, symbol: symbol, expiryDate: expiryDate })
+      JSON.stringify({
+        cost: cost,
+        symbol: symbol,
+        expiryDate: expiryDate,
+        price: price,
+      })
     );
   }
 
   async buy(req, res) {
     //Add temp deposit record for cross checking
-    let walletID = req.body.walletID;
-    let userID = await this.Method.getUserID(walletID);
+    let userID = await this.Method.getUserID(req.body.walletID);
     let transaction = JSON.stringify({
       tranxType: "deposit",
       exchange: "binance",
@@ -164,8 +169,8 @@ class Router {
       expiryDate: null,
       orderSide: null,
       orderType: null,
-      quantity: req.body.quantity,
-      price: req.body.quantity,
+      quantity: req.body.depositQuantity,
+      price: req.body.depositQuantity,
       currency: "USD",
       orderStatus: "pending",
       userID: userID,
@@ -202,20 +207,20 @@ class Router {
     //Match activities with request deposit amount
     if (accountActivities[0]) {
       for (each of accountActivities) {
-        if ((each.d = req.body.quantity)) {
+        if ((each.d = req.body.depositQuantity)) {
           let transactions = await client.depositHistory({
             coin: req.body.depositAsset,
             status: 1,
           });
           let filterTransaction = transactions.data.filter((x) => {
-            return (x.amount = req.body.quantity);
+            return (x.amount = req.body.depositQuantity);
           });
           let txID = filterTransaction[0].txId;
           //Search transaction history of the request walletID
           let urlBSC = await GenerateURL(
             process.env.URL_BSC,
             "/api",
-            `module=account&action=txlist&address=${walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
+            `module=account&action=txlist&address=${req.body.walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
             null
           );
           let requestConfigBSC = {
@@ -230,8 +235,10 @@ class Router {
           if (findMatch[0]) {
             await this.Method.updateDepositStatus(id);
             //Move deposit from spot to option account
-            let queryString = `currency=${req.body.asset}&type=IN&amount=${
-              req.body.quantity
+            let queryString = `currency=${
+              req.body.depositAsset
+            }&type=IN&amount=${
+              req.body.depositQuantity
             }&recvWindow=20000&timestamp=${Date.now()}`;
             let signature = await GenerateSignature(
               queryString,
@@ -255,7 +262,6 @@ class Router {
               //Buy options
               console.log("buy");
             }
-
             accountActivities = [];
           } else if (Date.now() > time + 60000) {
             res.send("transaction timeout");
@@ -272,73 +278,54 @@ class Router {
   }
 
   async test(req, res) {
-    // // Listen to account changes
-    // let time = Date.now();
+    // let queryString = `recvWindow=20000&timestamp=${Date.now()}`;
+    // let signature = await GenerateSignature(
+    //   queryString,
+    //   process.env.TEST_SECRET_KEY
+    // );
     // let url = await GenerateURL(
-    //   process.env.URL_SPOT,
-    //   "/api/v3/userDataStream",
-    //   null,
-    //   null
+    //   process.env.TEST_URL,
+    //   "/vapi/v1/account",
+    //   queryString,
+    //   signature
     // );
     // let requestConfig = {
-    //   method: "post",
+    //   method: "get",
     //   url: url,
     //   headers: {
-    //     "X-MBX-APIKEY": `${process.env.API_KEY}`,
+    //     "X-MBX-APIKEY": `${process.env.TEST_API_KEY}`,
     //   },
     // };
-    // let listenKey = await axios(requestConfig);
-    // let accountActivities = [];
-    // const callbacks = {
-    //   open: () => client.logger.debug("open"),
-    //   close: () => client.logger.debug("closed"),
-    //   message: (data) => {
-    //     client.logger.log(data);
-    //     accountActivities.push(JSON.parse(data));
-    //   },
-    // };
-    // const screamAC = client.userData(listenKey.data.listenKey, callbacks);
-    // setTimeout(() => client.unsubscribe(screamAC), 60000);
-    // if (accountActivities[0]) {
-    //   for (each of accountActivities) {
-    //     if ((each.d = req.body.quantity)) {
-    //       let transactions = await client.depositHistory({
-    //         coin: req.body.depositAsset,
-    //         status: 1,
-    //       });
-    //       let filterTransaction = transactions.data.filter((x) => {
-    //         return (x.amount = req.body.quantity);
-    //       });
-    //       let txID = filterTransaction[0].txId;
-    //       let urlBSC = await GenerateURL(
-    //         process.env.URL_BSC,
-    //         "/api",
-    //         `module=account&action=txlist&address=${walletID}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${process.env.API_KEY_BSC}`,
-    //         null
-    //       );
-    //       let requestConfigBSC = {
-    //         method: "post",
-    //         url: urlBSC,
-    //       };
-    //       let sendingAddress = await axios(requestConfigBSC);
-    //       let findMatch = sendingAddress.data.result.filter((x) => {
-    //         return x.hash == txID;
-    //       });
-    //       if (findMatch[0]) {
-    //         console.log("BUY!!!");
-    //         accountActivities = [];
-    //       } else if (Date.now() > time + 60000) {
-    //         res.send("transaction timeout");
-    //       }
-    //     } else if (Date.now() > time + 60000) {
-    //       accountActivities = [];
-    //       res.send("transaction timeout");
-    //     }
-    //   }
-    // } else if (!accountActivities[0] && Date.now() > time + 60000) {
-    //   accountActivities = [];
-    //   res.send("transaction timeout");
-    // }
+    // let response = await axios(requestConfig);
+    // console.log(response.data.data);
+
+    let queryString = `symbol=${req.body.symbol}&side=BUY&type=LIMIT&quantity=${
+      req.body.symbolQuantity
+    }&price=${req.body.symbolPrice}&recvWindow=20000&timestamp=${Date.now()}`;
+
+    let signature = await GenerateSignature(
+      queryString,
+      process.env.TEST_SECRET_KEY
+    );
+
+    let url = await GenerateURL(
+      process.env.TEST_URL,
+      "/vapi/v1/order",
+      queryString,
+      signature
+    );
+
+    let requestConfig = {
+      method: "post",
+      url: url,
+      headers: {
+        "X-MBX-APIKEY": `${process.env.TEST_API_KEY}`,
+      },
+    };
+
+    console.log(requestConfig);
+    // let response = await axios(requestConfig);
+    // console.log(response.data.data);
   }
 }
 module.exports = Router;
