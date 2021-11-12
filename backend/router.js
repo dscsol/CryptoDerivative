@@ -82,10 +82,11 @@ class Router {
   }
 
   async getPrice(req, res) {
-    let asset = req.body.formObj.underlying;
-    let quantity = req.body.formObj.quantity;
-    let date = req.body.formObj.expiryDate;
-
+    console.log("req.body: ", req.body);
+    let asset = req.body.underlying;
+    let quantity = req.body.quantity;
+    let date = req.body.expiryDate;
+    console.log(asset, " ", quantity, " ", date);
     //Get all contract
     let url = await GenerateURL(
       process.env.URL_OPTION,
