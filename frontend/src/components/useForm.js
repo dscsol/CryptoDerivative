@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
 import { changeQuoteForm } from "../redux/quoteFormSlice";
-import { changeQuotePrice } from "../redux/quotePriceSlice";
 import { DateTime } from "luxon";
 import axios from "redaxios";
 
