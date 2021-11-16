@@ -8,12 +8,6 @@ const Form = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // function submitForm(value) {
-  //   setIsSubmit(value);
-  // }
-  // function changeIsLoading(value) {
-  //   setIsLoading(value);
-  // }
   return (
     <div>
       <Container>

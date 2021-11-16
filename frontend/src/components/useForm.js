@@ -36,7 +36,7 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
     }
   };
 
-  // set errors and is submit when submit is click
+  // set errors to input and is submit when submit is click
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors(validate(form));
@@ -44,6 +44,7 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
   };
 
   // axios get quote from Binance
+  // sent loading and error to Form.js
   const axiosQuote = async () => {
     formLoading(true);
     await axios
@@ -61,7 +62,7 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
       });
   };
 
-  // listen Errors, if no errors then submit
+  // listen input errors, if no errors then submit
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmit) {
       addDateToISO({ period: form.period });
