@@ -1,20 +1,50 @@
 import FormQuote from "./FormQuote";
-import FormSuccess from "./FormSuccess";
+import Order from "./Order";
 import { useState } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Spinner } from "react-bootstrap";
 
 const Form = () => {
   const [isSubmit, setIsSubmit] = useState(false);
-  function submitForm() {
-    setIsSubmit(true);
-  }
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // function submitForm(value) {
+  //   setIsSubmit(value);
+  // }
+  // function changeIsLoading(value) {
+  //   setIsLoading(value);
+  // }
   return (
     <div>
       <Container>
-        {!isSubmit ? (
-          <FormQuote submitForm={submitForm}></FormQuote>
+        {error ? (
+          <div>
+            <h1>
+              <strong>{error}</strong>
+            </h1>
+          </div>
+        ) : isLoading ? (
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              height: "250px",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Spinner animation="grow"> </Spinner>
+            <Spinner animation="grow"> </Spinner>
+            <Spinner animation="grow"> </Spinner>
+          </div>
+        ) : isSubmit ? (
+          <Order />
         ) : (
-          <FormSuccess />
+          <FormQuote
+            formSubmit={setIsSubmit}
+            formLoading={setIsLoading}
+            formError={setError}
+          ></FormQuote>
         )}
       </Container>
     </div>
