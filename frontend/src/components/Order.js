@@ -1,14 +1,15 @@
 import { useSelector } from "react-redux";
 import { ListGroup, Button } from "react-bootstrap";
+import styles from "./Order.module.sass";
 
 const Order = () => {
   const form = useSelector((state) => state.quoteForm);
   const price = useSelector((state) => state.quotePrice);
   console.log(form);
   return (
-    <div>
-      <h2>Order Details</h2>
-      <ListGroup>
+    <>
+      <ListGroup className={styles["listGroup"]}>
+        <h2>Order Details</h2>
         {Object.keys(form).map((name) => {
           return name === "endDate" || name === "period" ? null : (
             <ListGroup.Item>{`${name}: ${form[name]}`}</ListGroup.Item>
@@ -25,9 +26,9 @@ const Order = () => {
         })}
       </ListGroup>
       <div className=" mb-3 d-grid gap-2">
-        <Button>Confirm Purchasing</Button>
+        <Button className={styles["button"]}>Confirm Purchasing</Button>
       </div>
-    </div>
+    </>
   );
 };
 

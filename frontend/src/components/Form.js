@@ -2,6 +2,7 @@ import FormQuote from "./FormQuote";
 import Order from "./Order";
 import { useState } from "react";
 import { Container, Spinner } from "react-bootstrap";
+import styles from "./Form.module.sass";
 
 const Form = () => {
   const [isSubmit, setIsSubmit] = useState(false);
@@ -9,8 +10,8 @@ const Form = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div>
-      <Container>
+    <div className={styles["background"]}>
+      <Container className={styles["container"]}>
         {error ? (
           <div>
             <h1>

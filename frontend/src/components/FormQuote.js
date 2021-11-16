@@ -81,7 +81,7 @@ const FormQuote = ({ formSubmit, formLoading, formError }) => {
 
       {/* submit button */}
       <div className=" mb-3 d-grid gap-2">
-        <Button type="submit" size="md">
+        <Button className={styles["button"]} type="submit" size="md">
           GET QUOTE
         </Button>
       </div>
