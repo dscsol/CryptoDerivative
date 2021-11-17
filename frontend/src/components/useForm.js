@@ -2,13 +2,17 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { changeQuoteForm } from "../redux/quoteFormSlice";
 import { changeQuotePrice } from "../redux/quotePriceSlice";
+import { changeStatus } from "../redux/statusSlice";
 import { DateTime } from "luxon";
 import axios from "redaxios";
+import { useHistory } from "react-router-dom";
 
 // custom hook for form handling
-const useForm = ({ formSubmit, formLoading, formError, validate }) => {
+const useForm = ({ validate }) => {
+  let history = useHistory();
   const form = useSelector((state) => state.quoteForm);
   const price = useSelector((state) => state.quotePrice);
+  const status = useSelector((state) => state.status);
   const dispatch = useDispatch();
 
   const [errors, setErrors] = useState({});
@@ -46,7 +50,7 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
   // axios get quote from Binance
   // sent loading and error to Form.js
   const axiosQuote = async () => {
-    formLoading(true);
+    dispatch(changeStatus({ isLoading: true }));
     await axios
       .post(`${process.env.REACT_APP_SERVER}/quote`, {
         underlying: form.underlying,
@@ -54,11 +58,11 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
         expiryDate: new Date(form.endDate).getTime(),
       })
       .then((res) => {
-        formLoading(false);
+        dispatch(changeStatus({ isLoading: false }));
         dispatch(changeQuotePrice(res.data));
       })
       .catch((err) => {
-        formError(`${err.status} ${err.statusText}`);
+        dispatch(changeStatus({ error: `${err.status} ${err.statusText}` }));
       });
   };
 
@@ -66,10 +70,9 @@ const useForm = ({ formSubmit, formLoading, formError, validate }) => {
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmit) {
       addDateToISO({ period: form.period });
-      formSubmit(true);
-      console.log("success");
+      dispatch(changeStatus({ isSubmit: true }));
       axiosQuote();
-      console.log("hello");
+      history.push("/order");
     }
   }, [errors]);
 
