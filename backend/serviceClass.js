@@ -55,7 +55,7 @@ class Method {
   async updateDepositStatus(id) {
     await knex("transactions")
       .update({
-        orderStatus: "success",
+        orderStatus: "RECEIVED",
       })
       .where("id", id);
   }

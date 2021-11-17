@@ -17,7 +17,6 @@ function App() {
   // }
 
   useEffect(() => {
-    // fetch();
     window.onload = async function () {
       let data = await web3.eth.getAccounts();
       if (data[0]) {
