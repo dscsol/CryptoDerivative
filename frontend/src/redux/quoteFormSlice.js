@@ -4,14 +4,14 @@ const initialState = {
   underlying: "BTC",
   quantity: 1,
   period: 1,
-  endDate: new Date().toISOString(0),
+  endDate: new Date().toISOString(),
 };
 
 export const quoteFormSlice = createSlice({
   name: "quoteFormSlice",
   initialState,
   reducers: {
-    changeFormQuote(state, action) {
+    changeQuoteForm(state, action) {
       Object.keys(action.payload).map((name) => {
         state[name] = action.payload[name];
       });
@@ -19,5 +19,5 @@ export const quoteFormSlice = createSlice({
   },
 });
 
-export const { changeFormQuote } = quoteFormSlice.actions;
+export const { changeQuoteForm } = quoteFormSlice.actions;
 export default quoteFormSlice.reducer;
