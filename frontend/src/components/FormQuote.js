@@ -3,15 +3,19 @@ import { useSelector } from "react-redux";
 import { Form, Button, InputGroup } from "react-bootstrap";
 // import { DateTime } from "luxon";
 import validate from "./validate";
-
 import useForm from "./useForm";
+import styles from "./FormQuote.module.sass";
 
-const FormQuote = ({ submitForm }) => {
+const FormQuote = ({ formSubmit, formLoading, formError }) => {
   // init
   // const dt = DateTime.now();
   const form = useSelector((state) => state.quoteForm);
-
-  const { handleChange, handleSubmit, errors } = useForm(submitForm, validate);
+  const { handleChange, handleSubmit, errors } = useForm({
+    formSubmit,
+    formLoading,
+    formError,
+    validate,
+  });
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -63,6 +67,7 @@ const FormQuote = ({ submitForm }) => {
             value={form.period}
             onChange={handleChange}
             isInvalid={Object.keys(errors).includes("period")}
+            step={1}
             required
           />
           <InputGroup.Text>Day(s)</InputGroup.Text>
@@ -76,7 +81,7 @@ const FormQuote = ({ submitForm }) => {
 
       {/* submit button */}
       <div className=" mb-3 d-grid gap-2">
-        <Button type="submit" size="md">
+        <Button className={styles["button"]} type="submit" size="md">
           GET QUOTE
         </Button>
       </div>
