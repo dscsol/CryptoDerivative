@@ -41,7 +41,7 @@ const useForm = (submitForm, validate) => {
   // axios get quote from Binance
   const axiosQuote = async () => {
     axios.defaults.baseURL = process.env.REACT_APP_SERVER;
-    let cost = await axios.post(`${process.env.REACT_APP_SERVER}/quote`, {
+    let cost = await axios.post(`${process.env.REACT_APP_SERVER}/test`, {
       underlying: form.underlying,
       quantity: form.quantity,
       expiryDate: new Date(form.endDate).getTime(),
