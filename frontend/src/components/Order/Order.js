@@ -72,7 +72,7 @@ const Order = () => {
           })}
         </ListGroup>
         <div className=" mb-3 d-grid gap-2">
-          {!wallet.walletAddress[0] ? (
+          {!!wallet.walletAddress[0] ? (
             <Button
               onClick={(e) => {
                 handleSubmit(e);

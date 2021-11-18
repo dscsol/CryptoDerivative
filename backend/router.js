@@ -42,7 +42,7 @@ class Router {
     router.post("/getTransactions", this.getTransactionsRecord.bind(this));
     router.get("/account", this.OptionAccountBalance.bind(this));
     router.post("/quote", this.getPrice.bind(this));
-    router.get("/buy", this.buy.bind(this));
+    router.post("/buy", this.buy.bind(this));
     router.post("/test", this.test.bind(this));
     return router;
   }
