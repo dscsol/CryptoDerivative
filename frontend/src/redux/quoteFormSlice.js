@@ -13,7 +13,7 @@ export const quoteFormSlice = createSlice({
   reducers: {
     changeQuoteForm(state, action) {
       Object.keys(action.payload).map((name) => {
-        state[name] = action.payload[name];
+        return (state[name] = action.payload[name]);
       });
     },
   },
