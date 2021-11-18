@@ -13,9 +13,9 @@ export const quotePriceSlice = createSlice({
     changeQuotePrice(state, action) {
       Object.keys(action.payload).map((name) => {
         if (name === "expiryDate") {
-          state[name] = new Date(action.payload[name]).toISOString();
+          return (state[name] = new Date(action.payload[name]).toISOString());
         } else {
-          state[name] = action.payload[name];
+          return (state[name] = action.payload[name]);
         }
       });
     },

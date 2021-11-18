@@ -17,6 +17,7 @@
     "react-scripts": "4.0.3",
     "reactstrap": "^8.10.1",
     "redaxios": "^0.4.1",
+    "sass": "^1.43.4",
     "web-vitals": "^1.1.2",
     "web3": "^1.6.0"
   },
