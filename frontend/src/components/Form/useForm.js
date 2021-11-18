@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changeQuoteForm } from "../redux/quoteFormSlice";
-import { changeQuotePrice } from "../redux/quotePriceSlice";
-import { changeStatus } from "../redux/statusSlice";
+import { changeQuoteForm } from "../../redux/quoteFormSlice";
+import { changeQuotePrice } from "../../redux/quotePriceSlice";
+import { changeStatus } from "../../redux/statusSlice";
 import { DateTime } from "luxon";
 import axios from "redaxios";
 import { useHistory } from "react-router-dom";
@@ -11,8 +11,6 @@ import { useHistory } from "react-router-dom";
 const useForm = ({ validate }) => {
   let history = useHistory();
   const form = useSelector((state) => state.quoteForm);
-  const price = useSelector((state) => state.quotePrice);
-  const status = useSelector((state) => state.status);
   const dispatch = useDispatch();
 
   const [errors, setErrors] = useState({});
@@ -62,6 +60,7 @@ const useForm = ({ validate }) => {
         dispatch(changeQuotePrice(res.data));
       })
       .catch((err) => {
+        console.log("error: ", err);
         dispatch(changeStatus({ error: `${err.status} ${err.statusText}` }));
       });
   };

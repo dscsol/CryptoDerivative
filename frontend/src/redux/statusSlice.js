@@ -13,7 +13,7 @@ export const statusSlice = createSlice({
   reducers: {
     changeStatus(state, action) {
       Object.keys(action.payload).map((name) => {
-        state[name] = action.payload[name];
+        return (state[name] = action.payload[name]);
       });
     },
   },

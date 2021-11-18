@@ -13,7 +13,13 @@ const PublicRoute = ({ component: Component, restricted, ...rest }) => {
     <Route
       {...rest}
       render={(props) =>
-        status.isLoading ? (
+        !!status.error ? (
+          <div>
+            <h1>
+              <strong>{status.error}</strong>
+            </h1>
+          </div>
+        ) : status.isLoading ? (
           <div
             style={{
               display: "flex",
@@ -26,12 +32,6 @@ const PublicRoute = ({ component: Component, restricted, ...rest }) => {
             <Spinner animation="grow"> </Spinner>
             <Spinner animation="grow"> </Spinner>
             <Spinner animation="grow"> </Spinner>
-          </div>
-        ) : !!status.error ? (
-          <div>
-            <h1>
-              <strong>{status.error}</strong>
-            </h1>
           </div>
         ) : (
           <Component {...props} />

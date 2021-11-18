@@ -2,19 +2,14 @@ import Nav from "./components/Nav";
 import { useDispatch } from "react-redux";
 import { addWallet } from "./redux/walletSlice";
 import web3 from "./web3";
-import { useEffect, Component } from "react";
-import Form from "./components/Form";
-import Order from "./components/Order";
-import axios from "redaxios";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { useEffect } from "react";
+import Form from "./components/Form/Form";
+import Order from "./components/Order/Order";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import PublicRoute from "./components/PublicRoute";
 
 function App() {
   let dispatch = useDispatch();
-
-  // async function fetch() {
-  //   await axios.get(`${process.env.REACT_APP_SERVER}/quote`);
-  // }
 
   useEffect(() => {
     window.onload = async function () {
