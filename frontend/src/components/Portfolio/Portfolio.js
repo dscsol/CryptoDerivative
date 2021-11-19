@@ -17,6 +17,14 @@ const Portfolio = () => {
     seTransactions(transactions.data);
   }, []);
 
+  let array = transactions.map((each) => {
+    return Object.keys(each);
+  });
+
+  let titles = array[0];
+
+  console.log(titles);
+
   return (
     <div className={styles["background"]}>
       <Container>
@@ -29,10 +37,11 @@ const Portfolio = () => {
         <Table responsive>
           <thead>
             <tr>
-              <th>#</th>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <th key={index}>Table heading</th>
-              ))}
+              {array[0][0]
+                ? titles.map((x) => {
+                    <td>{x}</td>;
+                  })
+                : null}
             </tr>
           </thead>
           <tbody>
