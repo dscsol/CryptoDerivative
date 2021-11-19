@@ -73,10 +73,7 @@ const useForm = ({ validate }) => {
       dispatch(changeStatus({ isSubmitQuote: true }));
       history.push("/quote");
     }
-    return () => {
-      setIsFirst(false);
-    };
-  }, [isSubmit]);
+  }, [errors]);
 
   return { handleChange, handleSubmit, addDateToISO, errors };
 };

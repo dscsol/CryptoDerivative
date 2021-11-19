@@ -24,7 +24,7 @@ const Quote = () => {
         depositAsset: "USDC",
         depositQuantity: price.cost,
         symbol: price.symbol,
-        quantity: form.quantity,
+        quantity: price.quantity,
         price: price.cost,
       })
       .then((res) => {
