@@ -9,8 +9,9 @@ import { useHistory } from "react-router-dom";
 
 // custom hook for form handling
 const useForm = ({ validate }) => {
-  let history = useHistory();
+  const history = useHistory();
   const form = useSelector((state) => state.quoteForm);
+  const price = useSelector((state) => state.quotePrice);
   const dispatch = useDispatch();
 
   const [errors, setErrors] = useState({});
@@ -41,7 +42,7 @@ const useForm = ({ validate }) => {
   // set errors to input and is submit when submit is click
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors(validate(form));
+    setErrors(validate({ values: form, price: price }));
     setIsSubmit(true);
   };
 
@@ -55,7 +56,7 @@ const useForm = ({ validate }) => {
         quantity: form.quantity,
         expiryDate: new Date(form.endDate).getTime(),
       })
-      .then((res) => {
+      .then(async (res) => {
         dispatch(changeStatus({ isLoading: false }));
         dispatch(changeQuotePrice(res.data));
       })
@@ -64,16 +65,18 @@ const useForm = ({ validate }) => {
         dispatch(changeStatus({ error: `${err.status} ${err.statusText}` }));
       });
   };
-
   // listen input errors, if no errors then submit
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmit) {
       addDateToISO({ period: form.period });
-      dispatch(changeStatus({ isSubmit: true }));
       axiosQuote();
-      history.push("/order");
+      dispatch(changeStatus({ isSubmitQuote: true }));
+      history.push("/quote");
     }
-  }, [errors]);
+    return () => {
+      setIsFirst(false);
+    };
+  }, [isSubmit]);
 
   return { handleChange, handleSubmit, addDateToISO, errors };
 };

@@ -3,10 +3,10 @@ import { ListGroup, Button, Container } from "react-bootstrap";
 import { changeStatus } from "../../redux/statusSlice";
 import { addWallet } from "../../redux/walletSlice";
 import axios from "redaxios";
-import styles from "./Order.module.sass";
+import styles from "./Quote.module.sass";
 import { useHistory } from "react-router-dom";
 
-const Order = () => {
+const Quote = () => {
   const form = useSelector((state) => state.quoteForm);
   const price = useSelector((state) => state.quotePrice);
   const wallet = useSelector((state) => state.wallet);
@@ -44,10 +44,11 @@ const Order = () => {
         method: "eth_requestAccounts",
       });
       const account = accounts[0];
+      dispatch(addWallet(account));
+
       await axios.post(`${process.env.REACT_APP_SERVER}/connectWallet`, {
         walletID: account,
       });
-      dispatch(addWallet(account));
     }
   };
 
@@ -55,7 +56,7 @@ const Order = () => {
     <div className={styles["background"]}>
       <Container className={styles["container"]}>
         <ListGroup className={styles["listGroup"]}>
-          <h2>Order Details</h2>
+          <h2>Quote Details</h2>
           {Object.keys(form).map((name) => {
             return name === "endDate" || name === "period" ? null : (
               <ListGroup.Item>{`${name}: ${form[name]}`}</ListGroup.Item>
@@ -96,4 +97,4 @@ const Order = () => {
   );
 };
 
-export default Order;
+export default Quote;
