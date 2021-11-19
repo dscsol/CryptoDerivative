@@ -4,7 +4,6 @@ import { changeStatus } from "../../redux/statusSlice";
 import { addWallet } from "../../redux/walletSlice";
 import axios from "redaxios";
 import styles from "./Quote.module.sass";
-import { useHistory } from "react-router-dom";
 
 const Quote = () => {
   const form = useSelector((state) => state.quoteForm);
@@ -57,13 +56,13 @@ const Quote = () => {
       <Container className={styles["container"]}>
         <ListGroup className={styles["listGroup"]}>
           <h2>Quote Details</h2>
-          {Object.keys(form).map((name) => {
+          {/* {Object.keys(form).map((name) => {
             return name === "endDate" || name === "period" ? null : (
               <ListGroup.Item>{`${name}: ${form[name]}`}</ListGroup.Item>
             );
-          })}
+          })} */}
           {Object.keys(price).map((name) => {
-            return name === "expiryDate" ? (
+            return name === "Expiry Date" ? (
               <ListGroup.Item>{`Expiry Date: ${new Date(
                 price[name]
               ).toString()}`}</ListGroup.Item>

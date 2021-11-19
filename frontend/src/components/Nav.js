@@ -22,7 +22,7 @@ function Nav() {
           </Navbar.Brand>
           <strong>
             <Link to="/portfolio" style={{ color: "white" }}>
-              portfolio
+              My Transactions
             </Link>
           </strong>
           {address ? (

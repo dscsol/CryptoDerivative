@@ -26,11 +26,12 @@ const Portfolio = () => {
     <div className={styles["background"]}>
       <Container>
         <h2>Portfolio</h2>
-        <ListGroup>
+        {/* <ListGroup>
           <ListGroup.Item>
             Wallet address: {wallet.walletAddress}
           </ListGroup.Item>
-        </ListGroup>
+        </ListGroup> */}
+
         {!!transactions ? (
           <Table striped bordered hover variant="dark">
             <thead>
@@ -42,10 +43,10 @@ const Portfolio = () => {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction) => {
+              {transactions.map((transaction, i) => {
                 return (
                   <tr>
-                    <td>{transaction["a"]}</td>
+                    <td>{i + 1}</td>
                     {Object.keys(transaction).map((name) => {
                       return (
                         <>
