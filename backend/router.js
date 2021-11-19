@@ -165,17 +165,42 @@ class Router {
           res.sendStatus(404);
         });
         if (markPrice.data.data[0]) {
-          console.log(sortStrike[0]);
-          res.send(
-            JSON.stringify({
-              cost: markPrice.data.data[0].markPrice * req.body.quantity,
-              symbol: sortStrike[0].symbol,
-              expiryDate: sortStrike[0].expiryDate,
-              price: sortStrike[0].markPrice,
-              minQty: sortStrike[0].minQty,
-              maxQty: sortStrike[0].maxQty,
-            })
-          );
+          if (req.body.quantity > sortStrike[0].maxQty) {
+            res.send(
+              JSON.stringify({
+                cost: markPrice.data.data[0].markPrice * sortStrike[0].maxQty,
+                symbol: sortStrike[0].symbol,
+                expiryDate: sortStrike[0].expiryDate,
+                price: sortStrike[0].markPrice,
+                minQty: sortStrike[0].minQty,
+                maxQty: sortStrike[0].maxQty,
+                comment: "adjusted to maxQTY",
+              })
+            );
+          } else if (req.body.quantity < sortStrike[0].minQty) {
+            res.send(
+              JSON.stringify({
+                cost: markPrice.data.data[0].markPrice * sortStrike[0].minQty,
+                symbol: sortStrike[0].symbol,
+                expiryDate: sortStrike[0].expiryDate,
+                price: sortStrike[0].markPrice,
+                minQty: sortStrike[0].minQty,
+                maxQty: sortStrike[0].maxQty,
+                comment: "adjusted to minQTY",
+              })
+            );
+          } else {
+            res.send(
+              JSON.stringify({
+                cost: markPrice.data.data[0].markPrice * req.body.quantity,
+                symbol: sortStrike[0].symbol,
+                expiryDate: sortStrike[0].expiryDate,
+                price: sortStrike[0].markPrice,
+                minQty: sortStrike[0].minQty,
+                maxQty: sortStrike[0].maxQty,
+              })
+            );
+          }
         } else {
           res.send("Result not found");
         }
