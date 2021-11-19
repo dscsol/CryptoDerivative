@@ -59,5 +59,14 @@ class Method {
       })
       .where("id", id);
   }
+
+  async updateOrderStatus(DBOrderID, orderID, status) {
+    await knex("transactions")
+      .update({
+        exchangeOrderID: orderID,
+        orderStatus: status,
+      })
+      .where("id", DBOrderID);
+  }
 }
 module.exports = Method;
