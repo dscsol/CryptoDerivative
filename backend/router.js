@@ -58,12 +58,14 @@ class Router {
 
   async getTransactionsRecord(req, res) {
     let walletID = req.body.walletID;
+
     let transactionsRecord = await this.Method.getTransactionsRecord(
       walletID
     ).catch((e) => {
       console.log("Can't get transaction record from DB" + e);
       res.sendStatus(404);
     });
+    console.log(transactionsRecord);
     res.send(transactionsRecord);
     res.end();
   }

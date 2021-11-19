@@ -10,7 +10,7 @@ export const walletSlice = createSlice({
   initialState: initialState,
   reducers: {
     addWallet(state, action) {
-      state.walletAddress.push(action.payload);
+      state.walletAddress.push(action.payload.toLowerCase());
     },
   },
 });
