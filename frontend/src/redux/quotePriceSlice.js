@@ -4,6 +4,8 @@ const initialState = {
   cost: 0,
   symbol: "",
   expiryDate: "",
+  maxQty: 1000000,
+  minQty: 0.000001,
 };
 
 export const quotePriceSlice = createSlice({

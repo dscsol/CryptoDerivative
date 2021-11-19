@@ -126,6 +126,7 @@ class Router {
           let diffB = Math.abs(req.body.expiryDate - b.expiryDate);
           return diffA - diffB;
         });
+        console.log("sortDate: ", sortDate);
 
         // Get current underlying asset market price
         let indexQueryString = `underlying=${sortDate[0].underlying}`;
@@ -177,35 +178,43 @@ class Router {
             res.send(
               JSON.stringify({
                 cost: markPrice.data.data[0].markPrice * sortStrike[0].maxQty,
+                quantity: sortStrike[0].maxQty,
                 symbol: sortStrike[0].symbol,
                 expiryDate: sortStrike[0].expiryDate,
                 price: sortStrike[0].markPrice,
                 minQty: sortStrike[0].minQty,
                 maxQty: sortStrike[0].maxQty,
-                comment: "adjusted to maxQTY",
+                strikePrice: sortStrike[0].strikePrice,
+                comment:
+                  "Your quantity has been adjusted to the Maximum allowed quantity.",
               })
             );
           } else if (req.body.quantity < sortStrike[0].minQty) {
             res.send(
               JSON.stringify({
                 cost: markPrice.data.data[0].markPrice * sortStrike[0].minQty,
+                quantity: sortStrike[0].minQty,
                 symbol: sortStrike[0].symbol,
                 expiryDate: sortStrike[0].expiryDate,
                 price: sortStrike[0].markPrice,
                 minQty: sortStrike[0].minQty,
                 maxQty: sortStrike[0].maxQty,
-                comment: "adjusted to minQTY",
+                strikePrice: sortStrike[0].strikePrice,
+                comment:
+                  "Your quantity has been adjusted to the Minimum allowed quantity.",
               })
             );
           } else {
             res.send(
               JSON.stringify({
                 cost: markPrice.data.data[0].markPrice * req.body.quantity,
+                quantity: req.body.quantity,
                 symbol: sortStrike[0].symbol,
                 expiryDate: sortStrike[0].expiryDate,
                 price: sortStrike[0].markPrice,
                 minQty: sortStrike[0].minQty,
                 maxQty: sortStrike[0].maxQty,
+                strikePrice: sortStrike[0].strikePrice,
               })
             );
           }

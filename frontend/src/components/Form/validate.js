@@ -1,12 +1,15 @@
-export default function validate(values) {
+export default function validate({ values, price }) {
+  console.log(price.minQty, price.maxQty);
   let errors = {};
   if (!values.underlying || values.underlying === "") {
     errors.underlying = "Asset type is required";
   }
   if (!values.quantity || values.quantity === "") {
     errors.quantity = "Quantity is required";
-  } else if (values.quantity < 0.001) {
-    errors.quantity = "Quantity must more than 0.001";
+  } else if (values.quantity < price.minQty) {
+    errors.quantity = `Quantity must more than ${price.minQty}`;
+  } else if (values.quantity > price.maxQty) {
+    errors.quantity = `Quantity must less than ${price.maxQty}`;
   }
   if (!values.period || values.period === "") {
     errors.period = "Period is require";
