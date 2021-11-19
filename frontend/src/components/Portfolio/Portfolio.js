@@ -8,22 +8,35 @@ import styles from "./Portfolio.module.sass";
 const Portfolio = () => {
   const wallet = useSelector((state) => state.wallet);
   const [transactions, seTransactions] = useState([]);
+  const [titles, settitles] = useState("");
+  const [details, setdetails] = useState([]);
+
+  async function getTitles(data) {
+    if (data) {
+      settitles(Object.keys(data));
+    }
+  }
+
+  async function getDetails(data) {
+    let detailList = [];
+    for (let each of data) {
+      let detail = Object.values(each);
+      detailList.push(detail);
+    }
+    setdetails(detailList);
+  }
+
   useEffect(async () => {
     let transactions = await axios.post(
       `${process.env.REACT_APP_SERVER}/getTransactions`,
       { walletID: wallet.walletAddress[0] }
     );
-    console.log(transactions.data);
     seTransactions(transactions.data);
-  }, []);
+    await getTitles(transactions.data[0]);
+    await getDetails(transactions.data);
+  }, [seTransactions]);
 
-  let array = transactions.map((each) => {
-    return Object.keys(each);
-  });
-
-  let titles = array[0];
-
-  console.log(titles);
+  console.log(details);
 
   return (
     <div className={styles["background"]}>
@@ -36,33 +49,10 @@ const Portfolio = () => {
         </ListGroup>
         <Table responsive>
           <thead>
-            <tr>
-              {array[0][0]
-                ? titles.map((x) => {
-                    <td>{x}</td>;
-                  })
-                : null}
-            </tr>
+            <tr>{titles[0] ? titles.map((each) => <th>{each}</th>) : null}</tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
-            <tr>
-              <td>2</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
-            <tr>
-              <td>3</td>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
+            <tr>{titles[0] ? titles.map((each) => <th>{each}</th>) : null}/</tr>
           </tbody>
         </Table>
       </Container>
