@@ -21,7 +21,10 @@ class Method {
   async getTransactionsRecord(walletID) {
     let id = await knex("users").where("walletID", walletID);
     if (id[0]) {
-      let data = await knex.select("*").from("transactions").where("id", id[0]);
+      let data = await knex
+        .select("*")
+        .from("transactions")
+        .where("userID", id[0].id);
       return data;
     } else {
       await knex.insert({ walletID: walletID }).into("users");
