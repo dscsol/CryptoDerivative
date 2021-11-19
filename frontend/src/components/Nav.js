@@ -2,6 +2,7 @@ import React from "react";
 import { Navbar, Container } from "react-bootstrap";
 import Wallet from "./Wallet";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 function Nav() {
   let address = useSelector((state) => {
@@ -19,6 +20,11 @@ function Nav() {
           <Navbar.Brand href="/">
             <strong>EasyHedge</strong>
           </Navbar.Brand>
+          <strong>
+            <Link to="/portfolio" style={{ color: "white" }}>
+              portfolio
+            </Link>
+          </strong>
           {address ? (
             <Navbar.Brand style={{ color: "white" }}>
               Address: {address}

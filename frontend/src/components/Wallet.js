@@ -1,28 +1,18 @@
 import { Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { addWallet } from "../redux/walletSlice";
-import axios from "redaxios";
+import connectWallet from "./connectWallet";
 
 function Wallet() {
   let dispatch = useDispatch();
-  async function click() {
-    if (!window.ethereum) {
-      window.alert("install metamask");
-    } else {
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      const account = accounts[0];
-      await axios.post(`${process.env.REACT_APP_SERVER}/connectWallet`, {
-        walletID: account,
-      });
-      dispatch(addWallet(account));
-    }
-  }
 
   return (
     <div>
-      <Button onClick={click} variant="dark">
+      <Button
+        onClick={() => {
+          connectWallet(dispatch);
+        }}
+        variant="dark"
+      >
         <i className="fas fa-wallet fa-2x" style={{ color: "#00cc6a" }}></i>
       </Button>
     </div>
