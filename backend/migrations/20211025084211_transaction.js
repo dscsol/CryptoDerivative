@@ -3,13 +3,13 @@ exports.up = function (knex) {
     table.increments();
     table.string("tranxType"); //transfer, contract, fee
     table.string("exchange");
-    table.integer("exchangeOrderID");
+    table.string("exchangeOrderID");
     table.string("asset");
     table.datetime("expiryDate");
     table.string("orderSide");
     table.string("orderType");
-    table.integer("quantity");
-    table.integer("price");
+    table.decimal("quantity");
+    table.decimal("price");
     table.string("currency");
     table.string("orderStatus");
     table.integer("userID").unsigned();

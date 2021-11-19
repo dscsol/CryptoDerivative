@@ -7,54 +7,61 @@ import styles from "./Portfolio.module.sass";
 
 const Portfolio = () => {
   const wallet = useSelector((state) => state.wallet);
-  const [transactions, seTransactions] = useState([]);
-  const [titles, settitles] = useState("");
-  const [details, setdetails] = useState([]);
-
-  async function getTitles(data) {
-    if (data) {
-      settitles(Object.keys(data));
-    }
-  }
-
-  async function getDetails(data) {
-    let detailList = [];
-    for (let each of data) {
-      let detail = Object.values(each);
-      detailList.push(detail);
-    }
-    setdetails(detailList);
-  }
-
+  const [transactions, setTransactions] = useState();
   useEffect(async () => {
-    let transactions = await axios.post(
-      `${process.env.REACT_APP_SERVER}/getTransactions`,
-      { walletID: wallet.walletAddress[0] }
-    );
-    seTransactions(transactions.data);
-    await getTitles(transactions.data[0]);
-    await getDetails(transactions.data);
-  }, [seTransactions]);
-
-  console.log(details);
+    await axios
+      .post(`${process.env.REACT_APP_SERVER}/getTransactions`, {
+        walletID: wallet.walletAddress[0],
+      })
+      .then((res) => {
+        console.log(res.data);
+        setTransactions(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   return (
     <div className={styles["background"]}>
       <Container>
         <h2>Portfolio</h2>
-        <ListGroup>
+        {/* <ListGroup>
           <ListGroup.Item>
             Wallet address: {wallet.walletAddress}
           </ListGroup.Item>
-        </ListGroup>
-        <Table responsive>
-          <thead>
-            <tr>{titles[0] ? titles.map((each) => <th>{each}</th>) : null}</tr>
-          </thead>
-          <tbody>
-            <tr>{titles[0] ? titles.map((each) => <th>{each}</th>) : null}/</tr>
-          </tbody>
-        </Table>
+        </ListGroup> */}
+
+        {!!transactions ? (
+          <Table striped bordered hover variant="dark">
+            <thead>
+              <tr>
+                <th>#</th>
+                {Object.keys(transactions[0]).map((name) => {
+                  return <th>{name}</th>;
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction, i) => {
+                return (
+                  <tr>
+                    <td>{i + 1}</td>
+                    {Object.keys(transaction).map((name) => {
+                      return (
+                        <>
+                          <td>{transaction[name]}</td>
+                        </>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        ) : (
+          <p>No data</p>
+        )}
       </Container>
     </div>
   );
