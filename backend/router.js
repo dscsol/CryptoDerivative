@@ -65,7 +65,7 @@ class Router {
       console.log("Can't get transaction record from DB" + e);
       res.sendStatus(404);
     });
-    console.log(transactionsRecord);
+
     res.send(transactionsRecord);
     res.end();
   }
