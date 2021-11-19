@@ -49,13 +49,23 @@ class Router {
 
   async connectWallet(req, res) {
     let walletID = req.body.walletID;
-    await this.Method.storeWalletID(walletID);
+    await this.Method.storeWalletID(walletID).catch((e) => {
+      console.log("Can't add walletID to DB" + e);
+      res.sendStatus(404);
+    });
     res.end();
   }
 
   async getTransactionsRecord(req, res) {
     let walletID = req.body.walletID;
-    let transactionsRecord = await this.Method.getTransactionsRecord(walletID);
+
+    let transactionsRecord = await this.Method.getTransactionsRecord(
+      walletID
+    ).catch((e) => {
+      console.log("Can't get transaction record from DB" + e);
+      res.sendStatus(404);
+    });
+    console.log(transactionsRecord);
     res.send(transactionsRecord);
     res.end();
   }
@@ -401,10 +411,40 @@ class Router {
                     res.sendStatus(404);
                   });
 
-                  //Check order status
+                  let transaction = JSON.stringify({
+                    tranxType: "OPTION",
+                    exchange: "BINANCE",
+                    asset: req.body.symbol,
+                    expiryDate: req.body.expiryDate,
+                    orderSide: "BUY",
+                    orderType: "LIMIT",
+                    quantity: req.body.quantity,
+                    price: req.body.price,
+                    currency: "USD",
+                    orderStatus: "PENDING ACCEPTANCE",
+                    userID: userID,
+                  });
 
+                  let DBOrderID = await this.Method.addTransactionsRecord(
+                    transaction
+                  ).catch((e) => {
+                    console.log("Can't add transaction record " + e);
+                    res.sendStatus(404);
+                  });
+
+                  //Check order status
                   if (response.data) {
                     let orderID = response.data.data.id;
+
+                    await this.Method.updateOrderStatus(
+                      DBOrderID,
+                      orderID,
+                      "ACCEPT"
+                    ).catch((e) => {
+                      console.log("Can't add transaction record " + e);
+                      res.sendStatus(404);
+                    });
+
                     let queryString = `recvWindow=20000&timestamp=${Date.now()}`;
 
                     let signature = await GenerateSignature(
@@ -454,27 +494,15 @@ class Router {
                           JSON.parse(data.toString()).o[0].oid === orderID &&
                           JSON.parse(data.toString()).o[0].s === 5
                         ) {
-                          let transaction = JSON.stringify({
-                            tranxType: "OPTION",
-                            exchange: "BINANCE",
-                            exchangeOrderID: orderID,
-                            asset: req.body.symbol,
-                            expiryDate: req.body.expiryDate,
-                            orderSide: "BUY",
-                            orderType: "LIMIT",
-                            quantity: req.body.quantity,
-                            price: req.body.price,
-                            currency: "USD",
-                            orderStatus: "FILLED",
-                            userID: userID,
-                          });
-
-                          await this.Method.addTransactionsRecord(
-                            transaction
+                          await this.Method.updateOrderStatus(
+                            DBOrderID,
+                            orderID,
+                            "FILLED"
                           ).catch((e) => {
                             console.log("Can't add transaction record " + e);
                             res.sendStatus(404);
                           });
+
                           ws.close();
                           res.send("Purchase is successful");
                         } else if (Date.now() > time + 60000) {
